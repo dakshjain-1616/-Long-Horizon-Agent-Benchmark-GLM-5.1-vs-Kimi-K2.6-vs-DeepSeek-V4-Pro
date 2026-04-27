@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560" style="background:#ffffff" fill="#111827" font-family="-apple-system, system-ui, Segoe UI, Roboto, sans-serif" font-size="13">
-  <rect data-bg="true" x="0" y="0" width="960" height="560" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" font-family="-apple-system, system-ui, Segoe UI, Roboto, sans-serif" font-size="13" width="960" height="560" fill="#0f172a">
+  <rect data-bg="true" x="0" y="0" width="960" height="560" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
   <text x="480" y="30" text-anchor="middle" font-weight="700" font-size="18" fill="#111827">Quality vs Tool-Call Count — what we measure</text>
   <text x="480" y="50" text-anchor="middle" fill="#6b7280">GLM-5.1 claims to keep improving past 50 tool calls. The benchmark verifies this independently.</text>
 
