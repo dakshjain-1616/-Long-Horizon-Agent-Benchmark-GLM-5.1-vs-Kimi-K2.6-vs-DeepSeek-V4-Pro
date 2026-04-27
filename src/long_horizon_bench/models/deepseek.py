@@ -14,8 +14,9 @@ from .base import BaseModelClient, ChatResponse, Message, ModelConfig, Usage
 class DeepSeekClient(BaseModelClient):
     """Client for DeepSeek V4-Pro."""
 
-    INPUT_PRICE_PER_1K = 0.002
-    OUTPUT_PRICE_PER_1K = 0.008
+    # Verified on OpenRouter (DeepSeek upstream), April 2026: V4-Pro = $0.435/M in, $0.87/M out.
+    INPUT_PRICE_PER_1K = 0.000435
+    OUTPUT_PRICE_PER_1K = 0.00087
 
     def __init__(self, config: ModelConfig) -> None:
         super().__init__(config)

@@ -14,8 +14,9 @@ from .base import BaseModelClient, ChatResponse, Message, ModelConfig, Usage
 class KimiClient(BaseModelClient):
     """Client for Kimi K2.6 (Moonshot AI)."""
 
-    INPUT_PRICE_PER_1K = 0.005
-    OUTPUT_PRICE_PER_1K = 0.015
+    # Verified on OpenRouter (Moonshot AI upstream), April 2026: $0.7448/M in, $4.655/M out.
+    INPUT_PRICE_PER_1K = 0.0007448
+    OUTPUT_PRICE_PER_1K = 0.004655
 
     def __init__(self, config: ModelConfig) -> None:
         super().__init__(config)

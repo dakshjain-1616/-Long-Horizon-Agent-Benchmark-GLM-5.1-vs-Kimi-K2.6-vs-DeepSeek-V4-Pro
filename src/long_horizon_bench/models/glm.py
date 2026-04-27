@@ -14,8 +14,9 @@ from .base import BaseModelClient, ChatResponse, Message, ModelConfig, Usage
 class GLMClient(BaseModelClient):
     """Client for GLM-5.1 (Zhipu AI)."""
 
-    INPUT_PRICE_PER_1K = 0.003
-    OUTPUT_PRICE_PER_1K = 0.006
+    # Verified on OpenRouter (Z.ai upstream), April 2026: $1.05/M in, $3.50/M out.
+    INPUT_PRICE_PER_1K = 0.00105
+    OUTPUT_PRICE_PER_1K = 0.0035
 
     def __init__(self, config: ModelConfig) -> None:
         super().__init__(config)

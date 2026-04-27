@@ -180,13 +180,13 @@ The CLI is the public interface. Console script: `lhb`.
 
 ## Models Used
 
-| Model | Endpoint | Provider | Params (active) | Notes |
-|---|---|---|---|---|
-| `THUDM/GLM-5.1` | `https://open.bigmodel.cn/api/paas/v4` | Zhipu AI | 744B (40B active, MoE) | April 2026, MIT-licensed flagship; the model the benchmark is *about*. |
-| `moonshotai/Kimi-K2.6` | `https://api.moonshot.cn/v1` | Moonshot AI | 1.1T | April 2026 reference comparison. |
-| `deepseek-v4-pro` | `https://api.deepseek.com/v1` | DeepSeek | 1.6T | April 2026 reference comparison; largest open-weights model released to date. |
+| Model | OpenRouter ID | Direct endpoint | Input $/M | Output $/M | Context | Notes |
+|---|---|---|---|---|---|---|
+| **GLM-5.1** | `z-ai/glm-5.1` | `https://open.bigmodel.cn/api/paas/v4` | $1.05 | $3.50 | 203K | Z.ai April 2026 flagship; the model the benchmark is *about*. |
+| **Kimi K2.6** | `moonshotai/kimi-k2.6` | `https://api.moonshot.cn/v1` | $0.7448 | $4.655 | 256K | Moonshot AI, 1.1T params, April 2026 reference comparison. |
+| **DeepSeek V4-Pro** | `deepseek/deepseek-v4-pro` | `https://api.deepseek.com/v1` | $0.435 | $0.87 | 1M | DeepSeek, 1.6T params, April 2026 reference comparison. |
 
-Recorded in `MODELS.md`. No other models are referenced anywhere in code, config, comments, or docs.
+Pricing verified live on OpenRouter (April 2026). Detailed sources in [`MODELS.md`](MODELS.md). No other models are referenced anywhere in code, config, comments, or docs.
 
 ## Testing
 

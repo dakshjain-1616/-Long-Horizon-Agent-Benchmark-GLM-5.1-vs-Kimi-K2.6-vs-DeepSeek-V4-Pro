@@ -26,17 +26,17 @@ _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 _MODEL_REGISTRY: dict[str, tuple[str, str, str]] = {
     "glm-5.1": (
         "https://open.bigmodel.cn/api/paas/v4",
-        "zhipu/glm-5.1",
+        "z-ai/glm-5.1",  # verified live on OpenRouter (Z.ai is the upstream provider id)
         "GLM_API_KEY",
     ),
     "kimi-k2.6": (
         "https://api.moonshot.cn/v1",
-        "moonshotai/kimi-k2.6",
+        "moonshotai/kimi-k2.6",  # verified live on OpenRouter
         "KIMI_API_KEY",
     ),
     "deepseek-v4-pro": (
         "https://api.deepseek.com/v1",
-        "deepseek/deepseek-v4-pro",
+        "deepseek/deepseek-v4-pro",  # verified live on OpenRouter
         "DEEPSEEK_API_KEY",
     ),
 }
@@ -274,9 +274,9 @@ def list_models():
     table.add_column("Output Price", style="yellow")
 
     models = [
-        ("glm-5.1", "GLM-5.1", "$0.003/1K", "$0.006/1K"),
-        ("kimi-k2.6", "Kimi K2.6", "$0.005/1K", "$0.015/1K"),
-        ("deepseek-v4-pro", "DeepSeek V4-Pro", "$0.002/1K", "$0.008/1K"),
+        ("glm-5.1", "GLM-5.1", "$1.05/M", "$3.50/M"),
+        ("kimi-k2.6", "Kimi K2.6", "$0.7448/M", "$4.655/M"),
+        ("deepseek-v4-pro", "DeepSeek V4-Pro", "$0.435/M", "$0.87/M"),
     ]
 
     for model_id, name, input_p, output_p in models:

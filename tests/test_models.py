@@ -148,11 +148,11 @@ class TestGLMClient:
         assert client.config == config
 
     def test_estimate_cost(self) -> None:
-        """Test GLM cost estimation."""
+        """Test GLM cost estimation (April 2026 OpenRouter pricing: $1.05/M in, $3.50/M out)."""
         config = ModelConfig(api_key="test", base_url="test", model="test")
         client = GLMClient(config)
         cost = client.estimate_cost(1000, 1000)
-        expected = 0.003 + 0.006
+        expected = 0.00105 + 0.0035
         assert abs(cost - expected) < 0.0001
 
 
@@ -170,11 +170,11 @@ class TestKimiClient:
         assert client.config == config
 
     def test_estimate_cost(self) -> None:
-        """Test Kimi cost estimation."""
+        """Test Kimi cost estimation (April 2026 OpenRouter pricing: $0.7448/M in, $4.655/M out)."""
         config = ModelConfig(api_key="test", base_url="test", model="test")
         client = KimiClient(config)
         cost = client.estimate_cost(1000, 1000)
-        expected = 0.005 + 0.015
+        expected = 0.0007448 + 0.004655
         assert abs(cost - expected) < 0.0001
 
 
@@ -192,11 +192,11 @@ class TestDeepSeekClient:
         assert client.config == config
 
     def test_estimate_cost(self) -> None:
-        """Test DeepSeek cost estimation."""
+        """Test DeepSeek cost estimation (April 2026 OpenRouter V4-Pro: $0.435/M in, $0.87/M out)."""
         config = ModelConfig(api_key="test", base_url="test", model="test")
         client = DeepSeekClient(config)
         cost = client.estimate_cost(1000, 1000)
-        expected = 0.002 + 0.008
+        expected = 0.000435 + 0.00087
         assert abs(cost - expected) < 0.0001
 
 
