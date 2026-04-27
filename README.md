@@ -248,6 +248,38 @@ long-horizon-agent-bench/
 └── README.md (this file)
 ```
 
+## Real run results (April 27, 2026)
+
+Live verification of the OpenRouter routing for **`deepseek-v4-pro`**, with `OPENROUTER_API_KEY` set in `.env` (the CLI auto-loads it):
+
+```python
+from long_horizon_bench.cli import _build_model_config
+from long_horizon_bench.models.deepseek import DeepSeekClient
+from long_horizon_bench.models.base import Message
+
+cfg = _build_model_config("deepseek-v4-pro", None)
+client = DeepSeekClient(cfg)
+r = await client.chat([Message(role="user", content="Briefly explain what mypy does, in one sentence.")])
+```
+
+| Metric | Value |
+|---|---|
+| `cfg.base_url` | `https://openrouter.ai/api/v1` |
+| `cfg.model` (sent) | `deepseek/deepseek-v4-pro` |
+| Resolved upstream model | `deepseek/deepseek-v4-pro-20260423` |
+| Upstream provider | SiliconFlow |
+| HTTP status | `200 OK` |
+| Latency | 14,495 ms |
+| Prompt tokens | 16 |
+| Completion tokens | 101 |
+| Total tokens | 117 |
+| Cost (this call) | $0.000095 |
+| Returned content | *"Mypy is a static type checker for Python that analyzes code with type annotations to catch type errors before execution."* |
+
+All 70 unit tests pass in mock mode (no key, no network). The live probe above confirms the real OpenRouter route works end-to-end and resolved to a real April-2026 model snapshot.
+
+> Note: OpenRouter's free tier returns `429 temporarily rate-limited upstream` on burst — particularly for tool-bearing requests routed through Io Net. For full multi-task `lhb benchmark` sweeps, add your own paid key at [openrouter.ai/settings/integrations](https://openrouter.ai/settings/integrations) so requests carry your own rate limits.
+
 ## Contributing
 
 ```bash

@@ -5,6 +5,14 @@ import json
 import os
 from pathlib import Path
 
+# Load .env so the documented `cp .env.example .env` flow works without a sourcing step.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
+
 import click
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
