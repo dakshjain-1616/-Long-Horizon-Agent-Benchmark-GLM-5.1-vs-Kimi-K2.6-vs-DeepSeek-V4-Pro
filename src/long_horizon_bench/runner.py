@@ -3,7 +3,7 @@
 import json
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .models.base import BaseModelClient, Message
 from .tools.base import BaseTool, ToolResult
@@ -16,9 +16,9 @@ class TraceStep:
     timestamp: float
     role: str  # "user", "assistant", "tool"
     content: str
-    tool_calls: Optional[List[Dict[str, Any]]] = None
-    tool_results: Optional[List[ToolResult]] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    tool_calls: list[dict[str, Any]] | None = None
+    tool_results: list[ToolResult] | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -27,15 +27,15 @@ class AgentTrace:
     task_id: str
     model_name: str
     start_time: float
-    end_time: Optional[float] = None
-    steps: List[TraceStep] = field(default_factory=list)
+    end_time: float | None = None
+    steps: list[TraceStep] = field(default_factory=list)
     total_tokens: int = 0
     total_cost: float = 0.0
     success: bool = False
     final_output: str = ""
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert trace to dictionary."""
         return {
             "task_id": self.task_id,
@@ -76,7 +76,7 @@ class AgentRunner:
     def __init__(
         self,
         model_client: BaseModelClient,
-        tools: List[BaseTool],
+        tools: list[BaseTool],
         max_steps: int = 50,
         mock_mode: bool = False,
     ) -> None:
@@ -90,16 +90,16 @@ class AgentRunner:
         self,
         task_id: str,
         prompt: str,
-        system_prompt: Optional[str] = None,
+        system_prompt: str | None = None,
     ) -> AgentTrace:
         """Run the agent on a task."""
         trace = AgentTrace(
             task_id=task_id,
-            model_name=self.model_client.config.model_id,
+            model_name=self.model_client.config.model,
             start_time=time.time(),
         )
 
-        messages: List[Message] = []
+        messages: list[Message] = []
         if system_prompt:
             messages.append(Message(role="system", content=system_prompt))
         messages.append(Message(role="user", content=prompt))
@@ -125,8 +125,8 @@ class AgentRunner:
 
             assistant_message = Message(
                 role="assistant",
-                content=response.content,
-                tool_calls=response.tool_calls,
+                content=response.message.content or "",
+                tool_calls=response.message.tool_calls,
             )
             messages.append(assistant_message)
 
@@ -134,17 +134,17 @@ class AgentRunner:
                 step_number=step,
                 timestamp=time.time(),
                 role="assistant",
-                content=response.content,
-                tool_calls=response.tool_calls,
+                content=response.message.content or "",
+                tool_calls=response.message.tool_calls,
             )
 
-            if not response.tool_calls:
+            if not response.message.tool_calls:
                 trace.steps.append(step_data)
                 trace.success = True
-                trace.final_output = response.content
+                trace.final_output = response.message.content or ""
                 break
 
-            tool_results = await self._execute_tool_calls(response.tool_calls)
+            tool_results = await self._execute_tool_calls(response.message.tool_calls)
             step_data.tool_results = tool_results
             trace.steps.append(step_data)
 
@@ -160,8 +160,8 @@ class AgentRunner:
 
     async def _execute_tool_calls(
         self,
-        tool_calls: List[Dict[str, Any]],
-    ) -> List[ToolResult]:
+        tool_calls: list[dict[str, Any]],
+    ) -> list[ToolResult]:
         """Execute tool calls from model response."""
         results = []
         for call in tool_calls:
@@ -186,10 +186,10 @@ class AgentRunner:
             results.append(result)
         return results
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get runner statistics."""
         return {
-            "model_name": self.model_client.config.model_id,
+            "model_name": self.model_client.config.model,
             "max_steps": self.max_steps,
             "available_tools": list(self.tools.keys()),
             "mock_mode": self.mock_mode,

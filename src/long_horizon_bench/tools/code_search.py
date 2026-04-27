@@ -17,7 +17,7 @@ class CodeSearchTool(BaseTool):
             mock_mode=mock_mode,
         )
 
-    async def execute(
+    async def execute(  # type: ignore[override]
         self,
         pattern: str,
         path: str = ".",

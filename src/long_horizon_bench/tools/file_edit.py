@@ -16,7 +16,7 @@ class FileEditTool(BaseTool):
             mock_mode=mock_mode,
         )
 
-    async def execute(
+    async def execute(  # type: ignore[override]
         self,
         operation: str,
         path: str,

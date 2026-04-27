@@ -16,7 +16,8 @@ class WebSearchTool(BaseTool):
         )
         self.api_key = api_key
 
-    async def execute(self, query: str, num_results: int = 5) -> ToolResult:
+    async def execute(  # type: ignore[override]
+        self, query: str, num_results: int = 5) -> ToolResult:
         """Execute web search."""
         if self.mock_mode:
             return self._mock_execute(query, num_results)

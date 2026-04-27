@@ -17,7 +17,8 @@ class ShellExecTool(BaseTool):
         )
         self.allowed_commands = allowed_commands or ["ls", "cat", "grep", "find", "pwd", "echo"]
 
-    async def execute(self, command: str, timeout: int = 30, cwd: str | None = None) -> ToolResult:
+    async def execute(  # type: ignore[override]
+        self, command: str, timeout: int = 30, cwd: str | None = None) -> ToolResult:
         """Execute shell command.
 
         Args:

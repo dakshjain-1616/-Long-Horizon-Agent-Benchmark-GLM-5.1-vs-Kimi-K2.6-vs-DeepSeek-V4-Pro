@@ -1,7 +1,7 @@
 """Metrics for evaluating agent performance."""
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -17,21 +17,21 @@ class TaskMetrics:
     total_tokens: int
     total_cost: float
     execution_time: float
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class BenchmarkResult:
     """Complete benchmark results."""
     model_name: str
-    task_results: List[TaskMetrics] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    task_results: list[TaskMetrics] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def add_result(self, result: TaskMetrics) -> None:
         """Add a task result."""
         self.task_results.append(result)
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Get summary statistics."""
         if not self.task_results:
             return {"error": "No results available"}
@@ -60,7 +60,7 @@ class BenchmarkResult:
             "total_execution_time": sum(times),
         }
 
-    def quality_vs_calls(self) -> List[Dict[str, Any]]:
+    def quality_vs_calls(self) -> list[dict[str, Any]]:
         """Get quality vs tool calls data for plotting."""
         return [
             {
@@ -77,7 +77,7 @@ class BenchmarkResult:
 class QualityGrader:
     """Base class for grading task quality."""
 
-    def grade(self, output: str, expected: Optional[str] = None) -> float:
+    def grade(self, output: str, expected: str | None = None) -> float:
         """Grade the output quality. Returns score 0.0 to 1.0."""
         raise NotImplementedError
 
@@ -88,7 +88,7 @@ class ExactMatchGrader(QualityGrader):
     def __init__(self, case_sensitive: bool = False) -> None:
         self.case_sensitive = case_sensitive
 
-    def grade(self, output: str, expected: Optional[str] = None) -> float:
+    def grade(self, output: str, expected: str | None = None) -> float:
         """Grade by exact match."""
         if expected is None:
             return 0.0
@@ -103,7 +103,7 @@ class ContainsMatchGrader(QualityGrader):
     def __init__(self, case_sensitive: bool = False) -> None:
         self.case_sensitive = case_sensitive
 
-    def grade(self, output: str, expected: Optional[str] = None) -> float:
+    def grade(self, output: str, expected: str | None = None) -> float:
         """Grade by substring match."""
         if expected is None:
             return 0.0
@@ -119,7 +119,7 @@ class RegexMatchGrader(QualityGrader):
         import re
         self.pattern = re.compile(pattern)
 
-    def grade(self, output: str, expected: Optional[str] = None) -> float:
+    def grade(self, output: str, expected: str | None = None) -> float:
         """Grade by regex match."""
         return 1.0 if self.pattern.search(output) else 0.0
 
@@ -127,11 +127,11 @@ class RegexMatchGrader(QualityGrader):
 class CompositeGrader(QualityGrader):
     """Grader that combines multiple graders."""
 
-    def __init__(self, graders: List[tuple[QualityGrader, float]]) -> None:
+    def __init__(self, graders: list[tuple]) -> None:
         """Initialize with list of (grader, weight) tuples."""
         self.graders = graders
 
-    def grade(self, output: str, expected: Optional[str] = None) -> float:
+    def grade(self, output: str, expected: str | None = None) -> float:
         """Grade by weighted average of graders."""
         total_score = 0.0
         total_weight = 0.0
@@ -157,8 +157,8 @@ def calculate_efficiency_score(
 
 
 def compare_models(
-    results: List[BenchmarkResult],
-) -> Dict[str, Any]:
+    results: list[BenchmarkResult],
+) -> dict[str, Any]:
     """Compare multiple model results."""
     if not results:
         return {"error": "No results to compare"}
@@ -169,7 +169,7 @@ def compare_models(
     }
 
     # Rank by different metrics
-    summaries = comparison["summaries"]
+    summaries: list[dict[str, Any]] = comparison["summaries"]  # type: ignore[assignment]
 
     # Best by success rate
     best_success = max(summaries, key=lambda x: x.get("success_rate", 0))

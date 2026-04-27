@@ -1,13 +1,8 @@
-.PHONY: install test lint format type-check clean plots dataset docs all verify
+.PHONY: install test lint format type-check clean plots dataset verify
 
-# Installation
 install:
 	pip install -e ".[dev]"
 
-install-prod:
-	pip install -e .
-
-# Testing
 test:
 	pytest tests/ -v --tb=short
 
@@ -23,7 +18,6 @@ test-tools:
 test-runner:
 	pytest tests/test_runner.py -v
 
-# Linting and formatting
 lint:
 	ruff check .
 
@@ -36,19 +30,15 @@ format:
 type-check:
 	mypy src/
 
-# Verification (all quality checks)
 verify: lint type-check test
-	@echo "✅ All verification checks passed!"
+	@echo "All verification checks passed!"
 
-# Plots
 plots:
 	python -m long_horizon_bench.plots --output-dir outputs/
 
-# Dataset generation
 dataset:
 	python -m long_horizon_bench.dataset --output-dir datasets/
 
-# Clean build artifacts
 clean:
 	rm -rf build/ dist/ *.egg-info/
 	rm -rf .pytest_cache/ .mypy_cache/ .ruff_cache/
@@ -56,17 +46,8 @@ clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete
 
-# Run benchmark
-run:
-	python -m long_horizon_bench.cli run --config config.yaml
-
 run-mock:
-	python -m long_horizon_bench.cli run --mock --config config.yaml
+	python -m long_horizon_bench.cli run --mock
 
-# Documentation
-docs:
-	@echo "See docs/ directory for documentation"
-
-# Full setup
 all: install verify
-	@echo "✅ Project setup complete!"
+	@echo "Project setup complete!"

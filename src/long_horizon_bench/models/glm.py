@@ -2,7 +2,8 @@
 
 import json
 import time
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -17,7 +18,6 @@ class GLMClient(BaseModelClient):
     OUTPUT_PRICE_PER_1K = 0.006
 
     def __init__(self, config: ModelConfig) -> None:
-        """Initialize GLM client."""
         super().__init__(config)
         self.client = httpx.AsyncClient(
             base_url=config.base_url or "https://open.bigmodel.cn/api/paas/v4",
@@ -26,67 +26,42 @@ class GLMClient(BaseModelClient):
         )
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-    async def chat(
-        self,
-        messages: List[Message],
-        tools: Optional[List[Dict[str, Any]]] = None,
-        tool_choice: Optional[str] = None,
-    ) -> ChatResponse:
-        """Send chat completion request to GLM API."""
+    async def chat(self, messages: list[Message], tools: list[dict[str, Any]] | None = None, tool_choice: str | None = None) -> ChatResponse:
         start_time = time.time()
         glm_messages = self._convert_messages(messages)
-        
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": self.config.model or "glm-5.1",
             "messages": glm_messages,
             "temperature": self.config.temperature,
         }
-        
         if self.config.max_tokens:
             payload["max_tokens"] = self.config.max_tokens
         if tools:
             payload["tools"] = tools
             if tool_choice:
                 payload["tool_choice"] = tool_choice
-
         response = await self.client.post("/chat/completions", json=payload)
         response.raise_for_status()
         data = response.json()
-        
         latency_ms = (time.time() - start_time) * 1000
         choice = data["choices"][0]
         message_data = choice["message"]
-        
         usage_data = data.get("usage", {})
         usage = Usage(
             prompt_tokens=usage_data.get("prompt_tokens", 0),
             completion_tokens=usage_data.get("completion_tokens", 0),
             total_tokens=usage_data.get("total_tokens", 0),
         )
-        
         cost = self.estimate_cost(usage.prompt_tokens, usage.completion_tokens)
         self._update_stats(usage, cost)
-        
         tool_calls = None
         if "tool_calls" in message_data:
             tool_calls = [
-                {
-                    "id": tc["id"],
-                    "type": tc["type"],
-                    "function": {
-                        "name": tc["function"]["name"],
-                        "arguments": tc["function"]["arguments"],
-                    },
-                }
+                {"id": tc["id"], "type": tc["type"], "function": {"name": tc["function"]["name"], "arguments": tc["function"]["arguments"]}}
                 for tc in message_data["tool_calls"]
             ]
-        
         return ChatResponse(
-            message=Message(
-                role=message_data.get("role", "assistant"),
-                content=message_data.get("content"),
-                tool_calls=tool_calls,
-            ),
+            message=Message(role=message_data.get("role", "assistant"), content=message_data.get("content"), tool_calls=tool_calls),
             usage=usage,
             model=data.get("model", self.config.model),
             finish_reason=choice.get("finish_reason"),
@@ -94,14 +69,9 @@ class GLMClient(BaseModelClient):
             cost_usd=cost,
         )
 
-    async def chat_stream(
-        self,
-        messages: List[Message],
-        tools: Optional[List[Dict[str, Any]]] = None,
-    ) -> AsyncIterator[str]:
-        """Stream chat completion from GLM API."""
+    async def chat_stream(self, messages: list[Message], tools: list[dict[str, Any]] | None = None) -> AsyncIterator[str]:
         glm_messages = self._convert_messages(messages)
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": self.config.model or "glm-5.1",
             "messages": glm_messages,
             "temperature": self.config.temperature,
@@ -109,7 +79,6 @@ class GLMClient(BaseModelClient):
         }
         if tools:
             payload["tools"] = tools
-
         async with self.client.stream("POST", "/chat/completions", json=payload) as response:
             response.raise_for_status()
             async for line in response.aiter_lines():
@@ -125,8 +94,7 @@ class GLMClient(BaseModelClient):
                     except (json.JSONDecodeError, KeyError):
                         continue
 
-    def count_tokens(self, messages: List[Message], tools: Optional[List[Dict[str, Any]]] = None) -> int:
-        """Estimate token count for messages."""
+    def count_tokens(self, messages: list[Message], tools: list[dict[str, Any]] | None = None) -> int:
         total = 0
         for msg in messages:
             total += 4
@@ -142,16 +110,14 @@ class GLMClient(BaseModelClient):
         return max(total, 1)
 
     def estimate_cost(self, prompt_tokens: int, completion_tokens: int) -> float:
-        """Estimate API cost in USD."""
         input_cost = (prompt_tokens / 1000) * self.INPUT_PRICE_PER_1K
         output_cost = (completion_tokens / 1000) * self.OUTPUT_PRICE_PER_1K
         return input_cost + output_cost
 
-    def _convert_messages(self, messages: List[Message]) -> List[Dict[str, Any]]:
-        """Convert internal Message format to GLM API format."""
+    def _convert_messages(self, messages: list[Message]) -> list[dict[str, Any]]:
         result = []
         for msg in messages:
-            msg_dict: Dict[str, Any] = {"role": msg.role}
+            msg_dict: dict[str, Any] = {"role": msg.role}
             if msg.content:
                 msg_dict["content"] = msg.content
             if msg.tool_calls:
@@ -164,5 +130,4 @@ class GLMClient(BaseModelClient):
         return result
 
     async def close(self) -> None:
-        """Close the HTTP client."""
         await self.client.aclose()
