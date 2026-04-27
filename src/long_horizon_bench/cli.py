@@ -20,19 +20,75 @@ from .tools import CodeSearchTool, FileEditTool, ShellExecTool, WebSearchTool
 console = Console()
 
 
+_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+# Map our short model ids to (direct base URL, OpenRouter model id, direct env var).
+_MODEL_REGISTRY: dict[str, tuple[str, str, str]] = {
+    "glm-5.1": (
+        "https://open.bigmodel.cn/api/paas/v4",
+        "zhipu/glm-5.1",
+        "GLM_API_KEY",
+    ),
+    "kimi-k2.6": (
+        "https://api.moonshot.cn/v1",
+        "moonshotai/kimi-k2.6",
+        "KIMI_API_KEY",
+    ),
+    "deepseek-v4-pro": (
+        "https://api.deepseek.com/v1",
+        "deepseek/deepseek-v4-pro",
+        "DEEPSEEK_API_KEY",
+    ),
+}
+
+
+def _build_model_config(model_name: str, api_key: str | None) -> "ModelConfig":
+    """Build a :class:`ModelConfig` for ``model_name``, preferring OpenRouter.
+
+    If ``OPENROUTER_API_KEY`` is set (and the caller didn't pass an explicit
+    ``api_key``), the client points at OpenRouter using the namespaced model id;
+    otherwise it falls back to the provider-specific env var and direct endpoint.
+    """
+    from .models.base import ModelConfig
+
+    if model_name not in _MODEL_REGISTRY:
+        raise ValueError(f"Unknown model: {model_name}")
+    direct_base, openrouter_id, direct_env = _MODEL_REGISTRY[model_name]
+
+    openrouter_key = os.getenv("OPENROUTER_API_KEY")
+    if api_key:
+        # Caller passed a key — assume direct API.
+        return ModelConfig(api_key=api_key, base_url=direct_base, model=model_name)
+    if openrouter_key:
+        return ModelConfig(api_key=openrouter_key, base_url=_OPENROUTER_BASE_URL, model=openrouter_id)
+    direct_key = os.getenv(direct_env, "")
+    if not direct_key:
+        raise ValueError(
+            f"No API key found. Set OPENROUTER_API_KEY (recommended) or {direct_env}, "
+            "or pass --api-key explicitly."
+        )
+    return ModelConfig(api_key=direct_key, base_url=direct_base, model=model_name)
+
+
 def get_model_client(model_name: str, api_key: str | None = None, mock_mode: bool = False):
-    """Get a model client by name."""
+    """Return a model client for ``model_name``.
+
+    - ``mock_mode=True`` always returns the :class:`MockModelClient` (no network).
+    - Otherwise, resolves the API key and base URL via OpenRouter (preferred)
+      with a fallback to the provider-specific direct API.
+    """
     if mock_mode:
         return MockModelClient()
 
+    config = _build_model_config(model_name, api_key)
+
     if model_name == "glm-5.1":
-        return GLMClient(api_key=api_key or os.getenv("GLM_API_KEY", ""))
-    elif model_name == "kimi-k2.6":
-        return KimiClient(api_key=api_key or os.getenv("KIMI_API_KEY", ""))
-    elif model_name == "deepseek-v4-pro":
-        return DeepSeekClient(api_key=api_key or os.getenv("DEEPSEEK_API_KEY", ""))
-    else:
-        raise ValueError(f"Unknown model: {model_name}")
+        return GLMClient(config)
+    if model_name == "kimi-k2.6":
+        return KimiClient(config)
+    if model_name == "deepseek-v4-pro":
+        return DeepSeekClient(config)
+    raise ValueError(f"Unknown model: {model_name}")
 
 
 @click.group()

@@ -74,10 +74,9 @@ flowchart LR
 
 - **Python**: 3.10 or newer
 - **OS**: Linux, macOS, or WSL2
-- **API keys** (only for real runs; not needed for mock mode):
-  - `GLM_API_KEY` — from [open.bigmodel.cn](https://open.bigmodel.cn)
-  - `MOONSHOT_API_KEY` — from [platform.moonshot.cn](https://platform.moonshot.cn/)
-  - `DEEPSEEK_API_KEY` — from [platform.deepseek.com](https://platform.deepseek.com/)
+- **One API key** (only for real runs; not needed for `--mock`):
+  - **Recommended:** `OPENROUTER_API_KEY` from [openrouter.ai/keys](https://openrouter.ai/keys) — a single key works for all three models.
+  - Alternative direct keys: `GLM_API_KEY` ([open.bigmodel.cn](https://open.bigmodel.cn)), `KIMI_API_KEY` ([platform.moonshot.cn](https://platform.moonshot.cn/)), `DEEPSEEK_API_KEY` ([platform.deepseek.com](https://platform.deepseek.com/)).
 - **Disk**: ~500MB for parquet trace exports
 
 ## Installation
@@ -93,12 +92,14 @@ cp .env.example .env          # then edit values
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `GLM_API_KEY` | — | Required to call GLM-5.1. |
-| `GLM_BASE_URL` | `https://open.bigmodel.cn/api/paas/v4` | Override for proxies. |
-| `MOONSHOT_API_KEY` | — | Required to call Kimi-K2.6. |
-| `MOONSHOT_BASE_URL` | `https://api.moonshot.cn/v1` | Override for proxies. |
-| `DEEPSEEK_API_KEY` | — | Required to call DeepSeek V4-Pro. |
-| `DEEPSEEK_BASE_URL` | `https://api.deepseek.com/v1` | Override for proxies. |
+| `OPENROUTER_API_KEY` | — | **Recommended.** One key for GLM-5.1, Kimi-K2.6, and DeepSeek V4-Pro (plus many more frontier models). When set, all three clients route through OpenRouter automatically. |
+| `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` | Override for proxies. |
+| `GLM_API_KEY` | — | Optional fallback for direct Zhipu calls. |
+| `KIMI_API_KEY` | — | Optional fallback for direct Moonshot calls. |
+| `DEEPSEEK_API_KEY` | — | Optional fallback for direct DeepSeek calls. |
+| `GLM_BASE_URL` | `https://open.bigmodel.cn/api/paas/v4` | Direct Zhipu endpoint (only used without OpenRouter). |
+| `KIMI_BASE_URL` | `https://api.moonshot.cn/v1` | Direct Moonshot endpoint. |
+| `DEEPSEEK_BASE_URL` | `https://api.deepseek.com/v1` | Direct DeepSeek endpoint. |
 | `OUTPUT_DIR` | `outputs/` | Where plots/results land. |
 | `DATASETS_DIR` | `datasets/` | Where parquet/dataset card land. |
 
