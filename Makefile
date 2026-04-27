@@ -34,10 +34,10 @@ verify: lint type-check test
 	@echo "All verification checks passed!"
 
 plots:
-	python -m long_horizon_bench.plots --output-dir outputs/
+	python3 -m long_horizon_bench.plots --output-dir outputs/
 
 dataset:
-	python -m long_horizon_bench.dataset --output-dir datasets/
+	python3 -m long_horizon_bench.dataset --output-dir datasets/
 
 clean:
 	rm -rf build/ dist/ *.egg-info/
@@ -47,7 +47,7 @@ clean:
 	find . -type f -name "*.pyc" -delete
 
 run-mock:
-	python -m long_horizon_bench.cli run --mock
+	python3 -m long_horizon_bench.cli run --mock
 
 all: install verify
 	@echo "Project setup complete!"

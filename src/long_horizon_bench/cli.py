@@ -229,5 +229,10 @@ def list_models():
     console.print(table)
 
 
+def main() -> None:
+    """Console-script entry point (referenced by pyproject.toml)."""
+    cli()
+
+
 if __name__ == "__main__":
     cli()

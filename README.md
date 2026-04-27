@@ -113,23 +113,27 @@ lhb list-tasks
 lhb list-models
 ```
 
-### Run the benchmark in mock mode (no API keys needed)
+### Run a single task in mock mode (no API keys needed)
 
 ```bash
-lhb run --mock --max-tool-calls 50
+lhb run -m kimi-k2.6 -t refactor_function --mock -o outputs/single_run.json
 ```
 
-### Run a single task suite against specific models
+### Run the full benchmark in mock mode
 
 ```bash
-lhb run --task refactoring --models THUDM/GLM-5.1,moonshotai/Kimi-K2.6,deepseek-v4-pro --mock
+lhb benchmark -m kimi-k2.6 --mock -o outputs/
 ```
 
-### Generate plots
+Add `-c refactoring` (or `research`, `data_analysis`, `debugging`) to filter to a single category.
+
+### Generate plots from a benchmark result
 
 ```bash
 make plots
-# writes outputs/quality-vs-tool-calls.png and per-suite breakdowns
+# python3 -m long_horizon_bench.plots --output-dir outputs/
+# writes outputs/quality_vs_calls.png, cost_distribution.png,
+# success_by_category.png, token_usage.png
 ```
 
 ### Export the HuggingFace dataset
@@ -146,10 +150,11 @@ The CLI is the public interface. Console script: `lhb`.
 | Subcommand | Purpose |
 |---|---|
 | `lhb list-tasks` | Print all 20 tasks grouped by category. |
-| `lhb list-models` | Print configured models with endpoint. |
-| `lhb run [--mock] [--task SUITE] [--models LIST] [--max-tool-calls N] [--budget-usd USD] [-o FILE]` | Execute the benchmark; emit `outputs/results.json`. |
-| `lhb plot [-i RESULTS] [-o DIR]` | Generate quality-vs-tool-calls PNG plots. |
-| `lhb dataset [-i RESULTS] [-o DIR]` | Export traces to parquet + dataset card. |
+| `lhb list-models` | Print configured models with pricing. |
+| `lhb run -m MODEL -t TASK [--mock] [-o FILE] [--max-steps N]` | Run a single task and write a trace JSON. |
+| `lhb benchmark -m MODEL [--mock] [-c CATEGORY] [-o DIR]` | Run all tasks (or one category) and write per-task traces + summary. |
+| `python3 -m long_horizon_bench.plots --output-dir DIR` | Generate quality/cost/success/token PNGs from a benchmark result. |
+| `python3 -m long_horizon_bench.dataset --traces-dir DIR --output-dir OUTDIR` | Export traces to parquet + dataset card. |
 
 `outputs/results.json` schema:
 

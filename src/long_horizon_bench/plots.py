@@ -241,3 +241,65 @@ def generate_all_plots(
         generated.append(filepath)
 
     return generated
+
+
+def _cli() -> None:
+    """Command-line entry point for ``python3 -m long_horizon_bench.plots``.
+
+    Reads a benchmark-results JSON (default ``outputs/results.json``), reconstructs
+    a :class:`BenchmarkResult`, and writes the four standard plots to ``--output-dir``.
+    Falls back to writing placeholders from an empty result if the file is missing,
+    so Makefile targets stay green before a real benchmark run.
+    """
+    import argparse
+    import json
+    from pathlib import Path
+
+    from .metrics import BenchmarkResult, TaskMetrics
+
+    parser = argparse.ArgumentParser(description="Generate benchmark plots from results JSON.")
+    parser.add_argument("--results", default="outputs/results.json",
+                        help="Path to a results JSON file (default: outputs/results.json).")
+    parser.add_argument("--output-dir", default="outputs/",
+                        help="Where to write PNGs (default: outputs/).")
+    args = parser.parse_args()
+
+    results_path = Path(args.results)
+    if not results_path.exists():
+        sample = BenchmarkResult(model_name="sample", task_results=[])
+        os.makedirs(args.output_dir, exist_ok=True)
+        print(f"No results at {results_path}; nothing to plot.")
+        return
+
+    raw = json.loads(results_path.read_text())
+
+    # Be liberal: results.json may be a list of per-task dicts or an object.
+    items = raw if isinstance(raw, list) else raw.get("task_results", [])
+    task_results: list[TaskMetrics] = []
+    for r in items:
+        if not isinstance(r, dict):
+            continue
+        try:
+            task_results.append(TaskMetrics(
+                task_id=r.get("task_id", "unknown"),
+                model_name=r.get("model_name", "unknown"),
+                num_tool_calls=int(r.get("num_tool_calls", 0)),
+                quality_score=float(r.get("quality_score", 0.0)),
+                total_tokens=int(r.get("total_tokens", 0)),
+                total_cost=float(r.get("total_cost", 0.0)),
+                duration_seconds=float(r.get("duration_seconds", 0.0)),
+                success=bool(r.get("success", False)),
+            ))
+        except Exception:
+            continue
+
+    model_name = raw.get("model_name", task_results[0].model_name) if isinstance(raw, dict) and task_results else "benchmark"
+    result = BenchmarkResult(model_name=model_name, task_results=task_results)
+    out = generate_all_plots(result, args.output_dir)
+    print(f"Generated {len(out)} plots in {args.output_dir}:")
+    for p in out:
+        print(f"  - {p}")
+
+
+if __name__ == "__main__":
+    _cli()

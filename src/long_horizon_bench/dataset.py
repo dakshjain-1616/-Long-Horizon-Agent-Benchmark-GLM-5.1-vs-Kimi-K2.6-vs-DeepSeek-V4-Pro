@@ -11,7 +11,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from .metrics import BenchmarkResult
-from .runner import AgentTrace
+from .runner import AgentTrace, TraceStep
 
 
 def trace_to_dataframe(traces: list[AgentTrace]) -> pd.DataFrame:
@@ -238,3 +238,51 @@ def load_traces_from_parquet(parquet_path: str) -> list[AgentTrace]:
         traces.append(trace)
 
     return traces
+
+
+def _cli() -> None:
+    """Command-line entry point for ``python3 -m long_horizon_bench.dataset``."""
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Export benchmark traces to a HuggingFace-format dataset.")
+    parser.add_argument("--traces-dir", default="outputs/",
+                        help="Directory containing per-task trace JSON files (default: outputs/).")
+    parser.add_argument("--output-dir", default="datasets/",
+                        help="Where to write parquet + dataset card (default: datasets/).")
+    args = parser.parse_args()
+
+    traces_dir = Path(args.traces_dir)
+    if not traces_dir.exists():
+        # Emit an empty-but-valid dataset so Makefile targets are non-fatal
+        # before a real run.
+        out = export_dataset([], args.output_dir)
+        print(f"No traces at {traces_dir}; wrote empty dataset to {args.output_dir}")
+        for k, v in out.items():
+            print(f"  {k}: {v}")
+        return
+
+    # Only consume JSON files that are clearly per-task agent traces.
+    # Skip aggregate results.json and other artefacts.
+    traces: list[AgentTrace] = []
+    for trace_path in traces_dir.glob("*.json"):
+        try:
+            data = json.loads(trace_path.read_text())
+            if not (isinstance(data, dict) and "task_id" in data and "model_name" in data and "steps" in data):
+                continue
+            steps = [s for s in data.get("steps", []) if isinstance(s, TraceStep)]
+            if len(steps) != len(data.get("steps", [])):
+                # Steps came in as plain dicts — coerce.
+                steps = [TraceStep(**s) for s in data["steps"] if isinstance(s, dict)]
+            data["steps"] = steps
+            traces.append(AgentTrace(**data))
+        except Exception as exc:
+            print(f"Skipping {trace_path}: {exc}")
+
+    out = export_dataset(traces, args.output_dir)
+    print(f"Exported {len(traces)} trace(s) to {args.output_dir}:")
+    for k, v in out.items():
+        print(f"  {k}: {v}")
+
+
+if __name__ == "__main__":
+    _cli()
