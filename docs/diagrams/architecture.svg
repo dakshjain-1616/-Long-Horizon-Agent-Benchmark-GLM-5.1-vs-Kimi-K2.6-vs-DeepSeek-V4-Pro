@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" font-family="-apple-system, system-ui, Segoe UI, Roboto, sans-serif" font-size="13">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f2937"/>
+    </marker>
+    <linearGradient id="lA" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#dbeafe"/><stop offset="1" stop-color="#bfdbfe"/></linearGradient>
+    <linearGradient id="lB" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fef3c7"/><stop offset="1" stop-color="#fde68a"/></linearGradient>
+    <linearGradient id="lC" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#dcfce7"/><stop offset="1" stop-color="#bbf7d0"/></linearGradient>
+    <linearGradient id="lD" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fae8ff"/><stop offset="1" stop-color="#f5d0fe"/></linearGradient>
+    <linearGradient id="lE" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fee2e2"/><stop offset="1" stop-color="#fecaca"/></linearGradient>
+  </defs>
+
+  <text x="480" y="28" text-anchor="middle" font-weight="700" font-size="18" fill="#111827">Long-Horizon Agent Benchmark — Architecture</text>
+  <text x="480" y="48" text-anchor="middle" fill="#6b7280">20 tasks · 4 categories · agent loop with 4 MCP-style tools · 3 frontier models</text>
+
+  <!-- 20 tasks -->
+  <rect x="30" y="80" width="200" height="200" rx="10" fill="url(#lA)" stroke="#1f2937"/>
+  <text x="130" y="105" text-anchor="middle" font-weight="700">20 tasks (4 categories)</text>
+  <text x="130" y="130" text-anchor="middle" fill="#374151">refactoring_tasks.py · 5</text>
+  <text x="130" y="152" text-anchor="middle" fill="#374151">research_tasks.py · 5</text>
+  <text x="130" y="174" text-anchor="middle" fill="#374151">data_analysis_tasks.py · 5</text>
+  <text x="130" y="196" text-anchor="middle" fill="#374151">debugging_tasks.py · 5</text>
+  <text x="130" y="225" text-anchor="middle" fill="#374151" font-size="11">tasks/__init__.py exports TASKS</text>
+  <text x="130" y="252" text-anchor="middle" fill="#374151" font-size="11">each task: prompt + tools + grader</text>
+
+  <!-- Runner -->
+  <rect x="290" y="120" width="220" height="120" rx="10" fill="url(#lC)" stroke="#1f2937"/>
+  <text x="400" y="143" text-anchor="middle" font-weight="700">AgentRunner</text>
+  <text x="400" y="165" text-anchor="middle" fill="#374151" font-size="11">runner.py · max_steps cap · budget cap</text>
+  <text x="400" y="190" text-anchor="middle" fill="#374151">plan → tool-call → observe</text>
+  <text x="400" y="208" text-anchor="middle" fill="#374151">→ score → next step</text>
+  <text x="400" y="228" text-anchor="middle" fill="#374151" font-size="11">emits AgentTrace per task</text>
+
+  <!-- 4 tools -->
+  <rect x="290" y="280" width="220" height="120" rx="10" fill="url(#lB)" stroke="#1f2937"/>
+  <text x="400" y="303" text-anchor="middle" font-weight="700">Tool suite (tools/)</text>
+  <text x="400" y="325" text-anchor="middle" fill="#374151">file_edit · web_search</text>
+  <text x="400" y="343" text-anchor="middle" fill="#374151">shell_exec · code_search</text>
+  <text x="400" y="367" text-anchor="middle" fill="#374151" font-size="11">JSON-schema validated, mock + real modes</text>
+
+  <!-- 3 model clients -->
+  <rect x="570" y="80" width="240" height="50" rx="8" fill="url(#lD)" stroke="#1f2937"/>
+  <text x="690" y="100" text-anchor="middle" font-weight="600">GLMClient — z-ai/glm-5.1</text>
+  <text x="690" y="118" text-anchor="middle" fill="#374151" font-size="11">744B MoE · 40B active · 203K ctx</text>
+
+  <rect x="570" y="145" width="240" height="50" rx="8" fill="url(#lD)" stroke="#1f2937"/>
+  <text x="690" y="165" text-anchor="middle" font-weight="600">KimiClient — moonshotai/kimi-k2.6</text>
+  <text x="690" y="183" text-anchor="middle" fill="#374151" font-size="11">1.1T params · 256K ctx</text>
+
+  <rect x="570" y="210" width="240" height="50" rx="8" fill="url(#lD)" stroke="#1f2937"/>
+  <text x="690" y="230" text-anchor="middle" font-weight="600">DeepSeekClient — deepseek/deepseek-v4-pro</text>
+  <text x="690" y="248" text-anchor="middle" fill="#374151" font-size="11">1.6T params · 1M ctx</text>
+
+  <rect x="570" y="275" width="240" height="50" rx="8" fill="url(#lD)" stroke="#1f2937"/>
+  <text x="690" y="295" text-anchor="middle" font-weight="600">MockModelClient (--mock)</text>
+  <text x="690" y="313" text-anchor="middle" fill="#374151" font-size="11">deterministic canned responses</text>
+
+  <!-- OpenRouter -->
+  <rect x="840" y="115" width="100" height="190" rx="10" fill="url(#lE)" stroke="#1f2937"/>
+  <text x="890" y="160" text-anchor="middle" font-weight="700">OpenRouter</text>
+  <text x="890" y="180" text-anchor="middle" fill="#374151" font-size="11">one key</text>
+  <text x="890" y="200" text-anchor="middle" fill="#374151" font-size="11">all 3 models</text>
+  <text x="890" y="225" text-anchor="middle" fill="#374151" font-size="11">/api/v1</text>
+  <text x="890" y="252" text-anchor="middle" fill="#374151" font-size="11">or direct provider</text>
+  <text x="890" y="272" text-anchor="middle" fill="#374151" font-size="11">via *_API_KEY</text>
+
+  <!-- Outputs -->
+  <rect x="290" y="430" width="220" height="60" rx="10" fill="url(#lA)" stroke="#1f2937"/>
+  <text x="400" y="452" text-anchor="middle" font-weight="700">datasets/ + outputs/</text>
+  <text x="400" y="472" text-anchor="middle" fill="#374151" font-size="11">traces.parquet · 4 PNG plots · results.json</text>
+
+  <!-- Metrics -->
+  <rect x="570" y="430" width="240" height="60" rx="10" fill="url(#lE)" stroke="#1f2937"/>
+  <text x="690" y="452" text-anchor="middle" font-weight="700">Metrics — metrics.py</text>
+  <text x="690" y="472" text-anchor="middle" fill="#374151" font-size="11">quality vs tool-call count · per-step grader</text>
+
+  <!-- arrows -->
+  <line x1="230" y1="180" x2="290" y2="180" stroke="#1f2937" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="510" y1="170" x2="570" y2="105" stroke="#1f2937" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="510" y1="180" x2="570" y2="170" stroke="#1f2937" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="510" y1="195" x2="570" y2="235" stroke="#1f2937" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="510" y1="220" x2="570" y2="300" stroke="#1f2937" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="810" y1="105" x2="840" y2="155" stroke="#1f2937" stroke-width="1.4" marker-end="url(#arr)"/>
+  <line x1="810" y1="170" x2="840" y2="195" stroke="#1f2937" stroke-width="1.4" marker-end="url(#arr)"/>
+  <line x1="810" y1="235" x2="840" y2="225" stroke="#1f2937" stroke-width="1.4" marker-end="url(#arr)"/>
+  <line x1="400" y1="240" x2="400" y2="280" stroke="#1f2937" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="400" y1="400" x2="400" y2="430" stroke="#1f2937" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="510" y1="460" x2="570" y2="460" stroke="#1f2937" stroke-width="1.6" marker-end="url(#arr)"/>
+
+  <!-- legend -->
+  <rect x="30" y="510" width="14" height="14" fill="url(#lA)" stroke="#1f2937"/><text x="50" y="522">Tasks / Outputs</text>
+  <rect x="160" y="510" width="14" height="14" fill="url(#lC)" stroke="#1f2937"/><text x="180" y="522">Agent loop</text>
+  <rect x="280" y="510" width="14" height="14" fill="url(#lB)" stroke="#1f2937"/><text x="300" y="522">Tools</text>
+  <rect x="370" y="510" width="14" height="14" fill="url(#lD)" stroke="#1f2937"/><text x="390" y="522">Model clients</text>
+  <rect x="490" y="510" width="14" height="14" fill="url(#lE)" stroke="#1f2937"/><text x="510" y="522">Inference / metrics infra</text>
+</svg>

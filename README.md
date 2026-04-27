@@ -1,7 +1,6 @@
 # Long-Horizon Agent Benchmark — GLM-5.1 vs Kimi K2.6 vs DeepSeek V4-Pro
 
-> Made Autonomously Using **NEO** — Your Autonomous AI Engineering Agent
-> [https://heyneo.com](https://heyneo.com)
+> Made Autonomously Using **[NEO](https://heyneo.com)** — Your Autonomous AI Engineering Agent
 
 [![Install for VS Code](https://img.shields.io/badge/NEO-VS%20Code%20Extension-blue?logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=NeoResearchInc.heyneo)
 [![Install for Cursor](https://img.shields.io/badge/NEO-Cursor%20Extension-purple?logo=cursor&logoColor=white)](https://marketplace.cursorapi.com/items/?itemName=NeoResearchInc.heyneo)
@@ -22,53 +21,13 @@ GLM-5.1's vendor claim — "keeps improving as task length grows" — has not be
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    subgraph Tasks["20 Tasks — src/long_horizon_bench/tasks/"]
-        REF[refactoring_tasks.py<br/>5 tasks]
-        RES[research_tasks.py<br/>5 tasks]
-        DA[data_analysis_tasks.py<br/>5 tasks]
-        DBG[debugging_tasks.py<br/>5 tasks]
-    end
+![Architecture](docs/diagrams/architecture.svg)
 
-    subgraph Tools["MCP-style tools — src/long_horizon_bench/tools/"]
-        FE[file_edit.py]
-        WS[web_search.py]
-        SE[shell_exec.py]
-        CS[code_search.py]
-    end
+### What the benchmark measures
 
-    subgraph Runner["BenchmarkRunner — src/long_horizon_bench/runner.py"]
-        LOOP[Plan → Tool-call → Observe → Score<br/>capped by --max-tool-calls / --budget-usd]
-    end
+GLM-5.1's vendor claim — *"keeps improving as task length grows"* — is the central thing this project verifies. Most models plateau and start hallucinating after 10–20 tool calls; the benchmark plots **quality vs tool-call count** for each model on the same 20 tasks:
 
-    subgraph Models["Model Clients — src/long_horizon_bench/models/"]
-        GLM["GLMClient<br/>THUDM/GLM-5.1<br/>https://open.bigmodel.cn/api/paas/v4"]
-        KIMI["KimiClient<br/>moonshotai/Kimi-K2.6<br/>https://api.moonshot.cn/v1"]
-        DS["DeepSeekClient<br/>deepseek-v4-pro<br/>https://api.deepseek.com/v1"]
-        MOCK[MockModelClient<br/>--mock]
-    end
-
-    subgraph Metrics["Scoring — src/long_horizon_bench/metrics.py"]
-        SCORE[per-step quality + composite final-score]
-    end
-
-    subgraph Outputs["Outputs"]
-        TRACE[(JSONL traces)]
-        DS_OUT[datasets/<br/>traces.parquet<br/>+ dataset_card.md]
-        PLOTS[outputs/<br/>quality-vs-tool-calls.png]
-    end
-
-    Tasks --> LOOP
-    LOOP --> Tools
-    LOOP --> Models
-    Tools --> LOOP
-    Models --> LOOP
-    LOOP --> SCORE
-    SCORE --> TRACE
-    TRACE --> DS_OUT
-    SCORE --> PLOTS
-```
+![Quality vs Tool-Call Count](docs/diagrams/quality-vs-calls.svg)
 
 ## Prerequisites
 
