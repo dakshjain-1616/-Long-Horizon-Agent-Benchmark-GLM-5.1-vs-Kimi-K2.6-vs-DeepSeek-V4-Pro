@@ -202,15 +202,31 @@ def run(model: str, task: str, mock: bool, output: str | None, max_steps: int, j
 @click.option("--mock", is_flag=True, help="Run in mock mode")
 @click.option("--output", "-o", type=click.Path(), help="Output directory for results")
 @click.option("--judge", "judge_model", default=None, help="LLM judge model id (e.g. openai/gpt-5.5).")
-def benchmark(model: str, category: str | None, mock: bool, output: str | None, judge_model: str | None):
-    """Run benchmark on all tasks."""
+@click.option("--concurrency", "-j", default=4, show_default=True, help="Max tasks to run in parallel.")
+def benchmark(
+    model: str,
+    category: str | None,
+    mock: bool,
+    output: str | None,
+    judge_model: str | None,
+    concurrency: int,
+):
+    """Run benchmark on all tasks (in parallel)."""
     tasks_to_run = {k: v for k, v in TASKS.items() if not category or v.category == category}
 
     if not tasks_to_run:
         console.print(f"[red]No tasks found for category: {category}[/red]")
         return
 
-    console.print(f"Running benchmark with {len(tasks_to_run)} tasks...")
+    console.print(
+        f"Running benchmark with {len(tasks_to_run)} tasks "
+        f"(concurrency={concurrency})..."
+    )
+
+    output_path = Path(output) if output else None
+    if output_path:
+        output_path.mkdir(parents=True, exist_ok=True)
+        (output_path / "traces").mkdir(parents=True, exist_ok=True)
 
     async def _benchmark():
         client = get_model_client(model, mock_mode=mock)
@@ -222,76 +238,90 @@ def benchmark(model: str, category: str | None, mock: bool, output: str | None, 
         ]
 
         result = BenchmarkResult(model_name=model)
+        sem = asyncio.Semaphore(max(1, concurrency))
 
         with Progress(console=console) as progress:
             task_progress = progress.add_task("Running tasks...", total=len(tasks_to_run))
 
-            for task_id, task_def in tasks_to_run.items():
-                progress.update(task_progress, description=f"Running {task_id}...")
-
-                runner = AgentRunner(
-                    model_client=client,
-                    tools=[t for t in tools if t.name in task_def.tools],
-                    max_steps=50,
-                    mock_mode=mock,
-                )
-
-                try:
-                    trace = await runner.run(
-                        task_id=task_id,
-                        prompt=task_def.prompt,
+            async def _run_one(task_id: str, task_def) -> TaskMetrics:
+                async with sem:
+                    runner = AgentRunner(
+                        model_client=client,
+                        tools=[t for t in tools if t.name in task_def.tools],
+                        max_steps=50,
+                        mock_mode=mock,
                     )
-                except Exception as exc:
-                    console.print(f"[red]Task {task_id} failed: {exc}[/red]")
-                    failed_metrics = TaskMetrics(
+                    try:
+                        trace = await runner.run(task_id=task_id, prompt=task_def.prompt)
+                    except Exception as exc:
+                        console.print(f"[red]Task {task_id} failed: {exc}[/red]")
+                        progress.advance(task_progress)
+                        return TaskMetrics(
+                            task_id=task_id,
+                            model_name=model,
+                            success=False,
+                            quality_score=0.0,
+                            num_tool_calls=0,
+                            total_tokens=0,
+                            total_cost=0.0,
+                            execution_time=0.0,
+                            metadata={"error": str(exc)[:500]},
+                        )
+
+                    quality_score = (
+                        task_def.grade(trace.final_output) if task_def.expected_output else 0.5
+                    )
+                    judge_meta: dict = {}
+                    judge_cost = 0.0
+                    if judge_model and not mock:
+                        try:
+                            jr = await judge_output(
+                                task_prompt=task_def.prompt,
+                                agent_output=trace.final_output or "",
+                                judge_model=judge_model,
+                            )
+                            quality_score = jr.score
+                            judge_cost = jr.cost_usd
+                            judge_meta = {
+                                "judge_model": jr.model,
+                                "judge_score": jr.score,
+                                "judge_rationale": jr.rationale,
+                                "judge_cost_usd": jr.cost_usd,
+                            }
+                        except Exception as e:
+                            judge_meta = {"judge_error": str(e)}
+
+                    metrics = TaskMetrics(
                         task_id=task_id,
                         model_name=model,
-                        success=False,
-                        quality_score=0.0,
-                        num_tool_calls=0,
-                        total_tokens=0,
-                        total_cost=0.0,
-                        execution_time=0.0,
-                        metadata={"error": str(exc)[:500]},
+                        success=trace.success,
+                        quality_score=quality_score,
+                        num_tool_calls=sum(1 for s in trace.steps if s.tool_results),
+                        total_tokens=trace.total_tokens,
+                        total_cost=trace.total_cost + judge_cost,
+                        execution_time=(trace.end_time or 0) - trace.start_time,
+                        metadata=judge_meta,
                     )
-                    result.add_result(failed_metrics)
+
+                    if output_path:
+                        trace_payload = trace.to_dict()
+                        if judge_meta:
+                            trace_payload["judge"] = judge_meta
+                        try:
+                            (output_path / "traces" / f"{task_id}.json").write_text(
+                                json.dumps(trace_payload, indent=2, default=str)
+                            )
+                        except Exception as e:
+                            console.print(f"[yellow]Could not save trace for {task_id}: {e}[/yellow]")
+
+                    progress.update(task_progress, description=f"Done {task_id}")
                     progress.advance(task_progress)
-                    continue
+                    return metrics
 
-                quality_score = task_def.grade(trace.final_output) if task_def.expected_output else 0.5
-                judge_meta: dict = {}
-                judge_cost = 0.0
-                if judge_model and not mock:
-                    try:
-                        jr = await judge_output(
-                            task_prompt=task_def.prompt,
-                            agent_output=trace.final_output or "",
-                            judge_model=judge_model,
-                        )
-                        quality_score = jr.score
-                        judge_cost = jr.cost_usd
-                        judge_meta = {
-                            "judge_model": jr.model,
-                            "judge_score": jr.score,
-                            "judge_rationale": jr.rationale,
-                            "judge_cost_usd": jr.cost_usd,
-                        }
-                    except Exception as e:
-                        judge_meta = {"judge_error": str(e)}
-
-                task_metrics = TaskMetrics(
-                    task_id=task_id,
-                    model_name=model,
-                    success=trace.success,
-                    quality_score=quality_score,
-                    num_tool_calls=sum(1 for s in trace.steps if s.tool_results),
-                    total_tokens=trace.total_tokens,
-                    total_cost=trace.total_cost + judge_cost,
-                    execution_time=(trace.end_time or 0) - trace.start_time,
-                    metadata=judge_meta,
-                )
-                result.add_result(task_metrics)
-                progress.advance(task_progress)
+            coros = [_run_one(tid, tdef) for tid, tdef in tasks_to_run.items()]
+            metrics_list = await asyncio.gather(*coros)
+            for m in metrics_list:
+                result.add_result(m)
 
         summary = result.get_summary()
 
@@ -305,10 +335,7 @@ def benchmark(model: str, category: str | None, mock: bool, output: str | None, 
 
         console.print(table)
 
-        if output:
-            output_path = Path(output)
-            output_path.mkdir(parents=True, exist_ok=True)
-
+        if output_path:
             full_payload = {
                 "summary": summary,
                 "model_name": model,
