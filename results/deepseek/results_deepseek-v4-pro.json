@@ -2,19 +2,19 @@
   "summary": {
     "model_name": "deepseek-v4-pro",
     "total_tasks": 20,
-    "successful_tasks": 17,
-    "success_rate": 0.85,
-    "avg_quality_score": 0.7,
-    "std_quality_score": 0.45825756949558394,
+    "successful_tasks": 20,
+    "success_rate": 1.0,
+    "avg_quality_score": 0.85,
+    "std_quality_score": 0.3570714214271425,
     "min_quality_score": 0.0,
     "max_quality_score": 1.0,
-    "avg_tool_calls": 1.75,
-    "std_tool_calls": 2.299456457513384,
-    "total_tool_calls": 35,
-    "total_cost": 0.0874611,
-    "avg_cost": 0.004373055,
-    "avg_execution_time": 193.286918759346,
-    "total_execution_time": 3865.73837518692
+    "avg_tool_calls": 2.15,
+    "std_tool_calls": 2.372235232855292,
+    "total_tool_calls": 43,
+    "total_cost": 0.10556319,
+    "avg_cost": 0.005278159500000001,
+    "avg_execution_time": 236.76984841823577,
+    "total_execution_time": 4735.396968364716
   },
   "model_name": "deepseek-v4-pro",
   "task_results": [
@@ -98,15 +98,13 @@
     {
       "task_id": "find_best_practices",
       "model_name": "deepseek-v4-pro",
-      "success": false,
-      "quality_score": 0.0,
-      "num_tool_calls": 0,
-      "total_tokens": 0,
-      "total_cost": 0.0,
-      "execution_time": 0.0,
-      "metadata": {
-        "error": "Client error '429 Too Many Requests' for url 'https://openrouter.ai/api/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
-      }
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 6087,
+      "total_cost": 0.0048546,
+      "execution_time": 324.16762828826904,
+      "metadata": {}
     },
     {
       "task_id": "research_api_usage",
@@ -155,28 +153,24 @@
     {
       "task_id": "clean_data",
       "model_name": "deepseek-v4-pro",
-      "success": false,
-      "quality_score": 0.0,
-      "num_tool_calls": 0,
-      "total_tokens": 0,
-      "total_cost": 0.0,
-      "execution_time": 0.0,
-      "metadata": {
-        "error": "Client error '429 Too Many Requests' for url 'https://openrouter.ai/api/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
-      }
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 6,
+      "total_tokens": 16858,
+      "total_cost": 0.008688255,
+      "execution_time": 377.58726382255554,
+      "metadata": {}
     },
     {
       "task_id": "statistical_analysis",
       "model_name": "deepseek-v4-pro",
-      "success": false,
-      "quality_score": 0.0,
-      "num_tool_calls": 0,
-      "total_tokens": 0,
-      "total_cost": 0.0,
-      "execution_time": 0.0,
-      "metadata": {
-        "error": "Client error '429 Too Many Requests' for url 'https://openrouter.ai/api/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
-      }
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 7330,
+      "total_cost": 0.004559235,
+      "execution_time": 167.90370106697083,
+      "metadata": {}
     },
     {
       "task_id": "create_visualization",
