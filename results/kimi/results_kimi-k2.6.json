@@ -1,0 +1,242 @@
+{
+  "summary": {
+    "model_name": "kimi-k2.6",
+    "total_tasks": 20,
+    "successful_tasks": 20,
+    "success_rate": 1.0,
+    "avg_quality_score": 0.9,
+    "std_quality_score": 0.30000000000000004,
+    "min_quality_score": 0.0,
+    "max_quality_score": 1.0,
+    "avg_tool_calls": 4.65,
+    "std_tool_calls": 10.827164910538677,
+    "total_tool_calls": 93,
+    "total_cost": 0.9198518336000001,
+    "avg_cost": 0.04599259168000001,
+    "avg_execution_time": 156.74011676311494,
+    "total_execution_time": 3134.8023352622986
+  },
+  "model_name": "kimi-k2.6",
+  "task_results": [
+    {
+      "task_id": "refactor_function",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 1507,
+      "total_cost": 0.005020883,
+      "execution_time": 26.886865854263306,
+      "metadata": {}
+    },
+    {
+      "task_id": "add_type_hints",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 2681,
+      "total_cost": 0.011138856400000001,
+      "execution_time": 67.46281790733337,
+      "metadata": {}
+    },
+    {
+      "task_id": "extract_class",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 4731,
+      "total_cost": 0.020415712800000003,
+      "execution_time": 133.8676724433899,
+      "metadata": {}
+    },
+    {
+      "task_id": "rename_variables",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 0.0,
+      "num_tool_calls": 0,
+      "total_tokens": 7076,
+      "total_cost": 0.031621042599999996,
+      "execution_time": 142.54407501220703,
+      "metadata": {}
+    },
+    {
+      "task_id": "add_docstrings",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 2159,
+      "total_cost": 0.009045223600000001,
+      "execution_time": 73.47718954086304,
+      "metadata": {}
+    },
+    {
+      "task_id": "find_documentation",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 2,
+      "total_tokens": 2190,
+      "total_cost": 0.0075628854,
+      "execution_time": 68.01143217086792,
+      "metadata": {}
+    },
+    {
+      "task_id": "compare_libraries",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 2523,
+      "total_cost": 0.0098363874,
+      "execution_time": 64.35000205039978,
+      "metadata": {}
+    },
+    {
+      "task_id": "find_best_practices",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 3995,
+      "total_cost": 0.0169583512,
+      "execution_time": 168.65126824378967,
+      "metadata": {}
+    },
+    {
+      "task_id": "research_api_usage",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 3347,
+      "total_cost": 0.013273267000000002,
+      "execution_time": 72.88808369636536,
+      "metadata": {}
+    },
+    {
+      "task_id": "summarize_article",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 2,
+      "total_tokens": 2618,
+      "total_cost": 0.009656890599999999,
+      "execution_time": 24.60988688468933,
+      "metadata": {}
+    },
+    {
+      "task_id": "analyze_csv",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 45,
+      "total_tokens": 332244,
+      "total_cost": 0.3717879606000001,
+      "execution_time": 884.1611914634705,
+      "metadata": {}
+    },
+    {
+      "task_id": "generate_report",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 0.0,
+      "num_tool_calls": 4,
+      "total_tokens": 17594,
+      "total_cost": 0.0299256916,
+      "execution_time": 116.59585309028625,
+      "metadata": {}
+    },
+    {
+      "task_id": "clean_data",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 2,
+      "total_tokens": 5616,
+      "total_cost": 0.014646492,
+      "execution_time": 80.37153887748718,
+      "metadata": {}
+    },
+    {
+      "task_id": "statistical_analysis",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 26,
+      "total_tokens": 234491,
+      "total_cost": 0.25241104420000005,
+      "execution_time": 632.4838762283325,
+      "metadata": {}
+    },
+    {
+      "task_id": "create_visualization",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 3,
+      "total_tokens": 17150,
+      "total_cost": 0.035569786,
+      "execution_time": 145.54469537734985,
+      "metadata": {}
+    },
+    {
+      "task_id": "fix_syntax_error",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 802,
+      "total_cost": 0.0025954418,
+      "execution_time": 28.878422498703003,
+      "metadata": {}
+    },
+    {
+      "task_id": "find_bug",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 894,
+      "total_cost": 0.0030315222,
+      "execution_time": 22.51444435119629,
+      "metadata": {}
+    },
+    {
+      "task_id": "optimize_code",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 1119,
+      "total_cost": 0.0039850524,
+      "execution_time": 14.53649377822876,
+      "metadata": {}
+    },
+    {
+      "task_id": "add_tests",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 6,
+      "total_tokens": 31986,
+      "total_cost": 0.060062906400000005,
+      "execution_time": 302.14889550209045,
+      "metadata": {}
+    },
+    {
+      "task_id": "refactor_legacy",
+      "model_name": "kimi-k2.6",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 2738,
+      "total_cost": 0.011306436400000001,
+      "execution_time": 64.81763029098511,
+      "metadata": {}
+    }
+  ]
+}

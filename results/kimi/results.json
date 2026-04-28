@@ -1,0 +1,17 @@
+{
+  "model_name": "kimi-k2.6",
+  "total_tasks": 20,
+  "successful_tasks": 20,
+  "success_rate": 1.0,
+  "avg_quality_score": 0.9,
+  "std_quality_score": 0.30000000000000004,
+  "min_quality_score": 0.0,
+  "max_quality_score": 1.0,
+  "avg_tool_calls": 4.65,
+  "std_tool_calls": 10.827164910538677,
+  "total_tool_calls": 93,
+  "total_cost": 0.9198518336000001,
+  "avg_cost": 0.04599259168000001,
+  "avg_execution_time": 156.74011676311494,
+  "total_execution_time": 3134.8023352622986
+}

@@ -1,0 +1,17 @@
+{
+  "model_name": "deepseek-v4-pro",
+  "total_tasks": 20,
+  "successful_tasks": 16,
+  "success_rate": 0.8,
+  "avg_quality_score": 0.7,
+  "std_quality_score": 0.45825756949558394,
+  "min_quality_score": 0.0,
+  "max_quality_score": 1.0,
+  "avg_tool_calls": 0.85,
+  "std_tool_calls": 1.3143439428094916,
+  "total_tool_calls": 17,
+  "total_cost": 0.040347555,
+  "avg_cost": 0.00201737775,
+  "avg_execution_time": 65.48650499582291,
+  "total_execution_time": 1309.7300999164581
+}

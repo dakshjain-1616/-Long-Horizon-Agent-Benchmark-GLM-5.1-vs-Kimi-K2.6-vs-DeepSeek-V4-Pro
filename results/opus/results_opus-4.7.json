@@ -1,0 +1,242 @@
+{
+  "summary": {
+    "model_name": "opus-4.7",
+    "total_tasks": 20,
+    "successful_tasks": 20,
+    "success_rate": 1.0,
+    "avg_quality_score": 0.9,
+    "std_quality_score": 0.3,
+    "min_quality_score": 0.0,
+    "max_quality_score": 1.0,
+    "avg_tool_calls": 0.95,
+    "std_tool_calls": 1.16081867662439,
+    "total_tool_calls": 19,
+    "total_cost": 1.49214,
+    "avg_cost": 0.074607,
+    "avg_execution_time": 19.642059087753296,
+    "total_execution_time": 392.8411817550659
+  },
+  "model_name": "opus-4.7",
+  "task_results": [
+    {
+      "task_id": "refactor_function",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 2,
+      "total_tokens": 11725,
+      "total_cost": 0.12412500000000001,
+      "execution_time": 25.674344301223755,
+      "metadata": {}
+    },
+    {
+      "task_id": "add_type_hints",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 2264,
+      "total_cost": 0.032299999999999995,
+      "execution_time": 8.376654624938965,
+      "metadata": {}
+    },
+    {
+      "task_id": "extract_class",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 6720,
+      "total_cost": 0.08204,
+      "execution_time": 22.0291690826416,
+      "metadata": {}
+    },
+    {
+      "task_id": "rename_variables",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 1979,
+      "total_cost": 0.024235,
+      "execution_time": 7.937498569488525,
+      "metadata": {}
+    },
+    {
+      "task_id": "add_docstrings",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 2716,
+      "total_cost": 0.04568,
+      "execution_time": 13.086646795272827,
+      "metadata": {}
+    },
+    {
+      "task_id": "find_documentation",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 4499,
+      "total_cost": 0.071095,
+      "execution_time": 22.431344032287598,
+      "metadata": {}
+    },
+    {
+      "task_id": "compare_libraries",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 2,
+      "total_tokens": 6337,
+      "total_cost": 0.08788499999999999,
+      "execution_time": 26.71243143081665,
+      "metadata": {}
+    },
+    {
+      "task_id": "find_best_practices",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 6987,
+      "total_cost": 0.12765500000000002,
+      "execution_time": 43.783178091049194,
+      "metadata": {}
+    },
+    {
+      "task_id": "research_api_usage",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 2,
+      "total_tokens": 8424,
+      "total_cost": 0.12774,
+      "execution_time": 35.848458766937256,
+      "metadata": {}
+    },
+    {
+      "task_id": "summarize_article",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 2683,
+      "total_cost": 0.025095,
+      "execution_time": 8.936684608459473,
+      "metadata": {}
+    },
+    {
+      "task_id": "analyze_csv",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 0.0,
+      "num_tool_calls": 5,
+      "total_tokens": 26851,
+      "total_cost": 0.22213500000000003,
+      "execution_time": 40.916523694992065,
+      "metadata": {}
+    },
+    {
+      "task_id": "generate_report",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 2605,
+      "total_cost": 0.043045,
+      "execution_time": 14.540915250778198,
+      "metadata": {}
+    },
+    {
+      "task_id": "clean_data",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 5699,
+      "total_cost": 0.071835,
+      "execution_time": 19.265552043914795,
+      "metadata": {}
+    },
+    {
+      "task_id": "statistical_analysis",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 7270,
+      "total_cost": 0.08990999999999999,
+      "execution_time": 21.62145972251892,
+      "metadata": {}
+    },
+    {
+      "task_id": "create_visualization",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 1,
+      "total_tokens": 7154,
+      "total_cost": 0.08981,
+      "execution_time": 20.839041233062744,
+      "metadata": {}
+    },
+    {
+      "task_id": "fix_syntax_error",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 2030,
+      "total_cost": 0.027950000000000003,
+      "execution_time": 7.065540790557861,
+      "metadata": {}
+    },
+    {
+      "task_id": "find_bug",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 1892,
+      "total_cost": 0.024640000000000002,
+      "execution_time": 7.672461032867432,
+      "metadata": {}
+    },
+    {
+      "task_id": "optimize_code",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 2136,
+      "total_cost": 0.02962,
+      "execution_time": 9.597650289535522,
+      "metadata": {}
+    },
+    {
+      "task_id": "add_tests",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 0.0,
+      "num_tool_calls": 1,
+      "total_tokens": 8212,
+      "total_cost": 0.10408,
+      "execution_time": 24.81171989440918,
+      "metadata": {}
+    },
+    {
+      "task_id": "refactor_legacy",
+      "model_name": "opus-4.7",
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 2665,
+      "total_cost": 0.041265,
+      "execution_time": 11.693907499313354,
+      "metadata": {}
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "task_id": "research_api_usage",
+  "model_name": "anthropic/claude-opus-4-7",
+  "start_time": 1777390868.9810348,
+  "end_time": 1777390904.8294935,
+  "total_tokens": 8424,
+  "total_cost": 0.12774,
+  "success": true,
+  "final_output": "The web search tool isn't functional in this environment (it returns \"Real search API not configured\"). I'll provide a comprehensive guide based on my training knowledge of the OpenAI API. Note that pricing and rate limits change frequently, so I'll direct you to the official sources for the latest numbers.\n\n---\n\n# Complete Guide to OpenAI Chat Completions API\n\n> \u26a0\ufe0f **Note on research**: The web search tool was unavailable in this session, so this guide is compiled from my training knowledge. For the most current pricing, model names, and rate limits, always verify at the official sources listed at the bottom.\n\n## 1. Official Documentation\n\n- **Main docs**: https://platform.openai.com/docs/\n- **Chat completions reference**: https://platform.openai.com/docs/api-reference/chat\n- **Guide**: https://platform.openai.com/docs/guides/text-generation\n- **Python SDK (GitHub)**: https://github.com/openai/openai-python\n\n## 2. The Chat Completions Endpoint\n\n**Endpoint**: `POST https://api.openai.com/v1/chat/completions`\n\nThe API takes a list of messages representing a conversation and returns a model-generated response. Each message has a `role` (`system`, `user`, `assistant`, or `tool`) and `content`.\n\nOpenAI now also offers a newer **Responses API** (`/v1/responses`), but Chat Completions remains the most widely used and supported endpoint.\n\n## 3. Key Parameters\n\n| Parameter | Type | Description |\n|---|---|---|\n| `model` | string (required) | e.g. `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo`, `gpt-3.5-turbo` |\n| `messages` | array (required) | Conversation history as `{\"role\": ..., \"content\": ...}` |\n| `temperature` | float (0\u20132) | Randomness. Lower = deterministic, higher = creative. Default 1 |\n| `top_p` | float (0\u20131) | Nucleus sampling alternative to temperature |\n| `max_tokens` / `max_completion_tokens` | int | Cap on output tokens |\n| `n` | int | How many completions to generate |\n| `stream` | bool | Stream tokens via server-sent events |\n| `stop` | string/array | Up to 4 stop sequences |\n| `presence_penalty` | float (-2 to 2) | Encourage new topics |\n| `frequency_penalty` | float (-2 to 2) | Discourage repetition |\n| `seed` | int | For (best-effort) reproducibility |\n| `response_format` | object | e.g. `{\"type\": \"json_object\"}` or JSON schema |\n| `tools` | array | Function/tool definitions for tool calling |\n| `tool_choice` | string/object | Control which tool the model calls |\n| `user` | string | End-user ID for abuse monitoring |\n\n## 4. Python Code Examples\n\n### Setup\n\n```bash\npip install openai\nexport OPENAI_API_KEY=\"sk-...\"\n```\n\n### Basic Example\n\n```python\nfrom openai import OpenAI\n\nclient = OpenAI()  # reads OPENAI_API_KEY from env\n\nresponse = client.chat.completions.create(\n    model=\"gpt-4o-mini\",\n    messages=[\n        {\"role\": \"system\", \"content\": \"You are a helpful assistant.\"},\n        {\"role\": \"user\", \"content\": \"Explain quantum entanglement in one sentence.\"}\n    ],\n    temperature=0.7,\n    max_tokens=200,\n)\n\nprint(response.choices[0].message.content)\nprint(\"Tokens used:\", response.usage.total_tokens)\n```\n\n### Multi-Turn Conversation\n\n```python\nconversation = [\n    {\"role\": \"system\", \"content\": \"You are a concise Python tutor.\"}\n]\n\ndef chat(user_input):\n    conversation.append({\"role\": \"user\", \"content\": user_input})\n    resp = client.chat.completions.create(\n        model=\"gpt-4o-mini\",\n        messages=conversation,\n    )\n    reply = resp.choices[0].message.content\n    conversation.append({\"role\": \"assistant\", \"content\": reply})\n    return reply\n\nprint(chat(\"What is a list comprehension?\"))\nprint(chat(\"Show me an example.\"))  # Model remembers context\n```\n\n### Streaming Responses\n\n```python\nstream = client.chat.completions.create(\n    model=\"gpt-4o-mini\",\n    messages=[{\"role\": \"user\", \"content\": \"Write a haiku about the ocean.\"}],\n    stream=True,\n)\n\nfor chunk in stream:\n    delta = chunk.choices[0].delta.content\n    if delta:\n        print(delta, end=\"\", flush=True)\nprint()\n```\n\n### Structured JSON Output\n\n```python\nresponse = client.chat.completions.create(\n    model=\"gpt-4o-mini\",\n    messages=[\n        {\"role\": \"system\", \"content\": \"Return JSON only.\"},\n        {\"role\": \"user\", \"content\": \"List 3 primary colors with hex codes.\"}\n    ],\n    response_format={\"type\": \"json_object\"},\n)\n\nimport json\ndata = json.loads(response.choices[0].message.content)\nprint(data)\n```\n\n### Function / Tool Calling\n\n```python\nimport json\n\ntools = [{\n    \"type\": \"function\",\n    \"function\": {\n        \"name\": \"get_weather\",\n        \"description\": \"Get current weather for a city\",\n        \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\n                \"city\": {\"type\": \"string\"},\n                \"unit\": {\"type\": \"string\", \"enum\": [\"celsius\", \"fahrenheit\"]}\n            },\n            \"required\": [\"city\"]\n        }\n    }\n}]\n\ndef get_weather(city, unit=\"celsius\"):\n    return {\"city\": city, \"temp\": 22, \"unit\": unit, \"condition\": \"sunny\"}\n\nmessages = [{\"role\": \"user\", \"content\": \"What's the weather in Paris?\"}]\n\nresp = client.chat.completions.create(\n    model=\"gpt-4o-mini\",\n    messages=messages,\n    tools=tools,\n)\n\nmsg = resp.choices[0].message\nif msg.tool_calls:\n    messages.append(msg)  # assistant message with tool_calls\n    for call in msg.tool_calls:\n        args = json.loads(call.function.arguments)\n        result = get_weather(**args)\n        messages.append({\n            \"role\": \"tool\",\n            \"tool_call_id\": call.id,\n            \"content\": json.dumps(result),\n        })\n\n    final = client.chat.completions.create(\n        model=\"gpt-4o-mini\",\n        messages=messages,\n    )\n    print(final.choices[0].message.content)\n```\n\n### Error Handling & Retries\n\n```python\nfrom openai import OpenAI, RateLimitError, APIError\nimport time\n\nclient = OpenAI()\n\ndef chat_with_retry(messages, retries=3):\n    for i in range(retries):\n        try:\n            return client.chat.completions.create(\n                model=\"gpt-4o-mini\",\n                messages=messages,\n            )\n        except RateLimitError:\n            wait = 2 ** i\n            print(f\"Rate limited. Waiting {wait}s...\")\n            time.sleep(wait)\n        except APIError as e:\n            print(f\"API error: {e}\")\n            raise\n    raise RuntimeError(\"Max retries exceeded\")\n```\n\n### Async Usage\n\n```python\nimport asyncio\nfrom openai import AsyncOpenAI\n\naclient = AsyncOpenAI()\n\nasync def ask(q):\n    r = await aclient.chat.completions.create(\n        model=\"gpt-4o-mini\",\n        messages=[{\"role\": \"user\", \"content\": q}],\n    )\n    return r.choices[0].message.content\n\nasync def main():\n    answers = await asyncio.gather(\n        ask(\"Capital of France?\"),\n        ask(\"Capital of Japan?\"),\n        ask(\"Capital of Brazil?\"),\n    )\n    print(answers)\n\nasyncio.run(main())\n```\n\n## 5. Rate Limits & Pricing\n\n### Rate Limits\n\nRate limits are enforced along **five dimensions**:\n- RPM (requests per minute)\n- RPD (requests per day)\n- TPM (tokens per minute)\n- TPD (tokens per day)\n- IPM (images per minute, for image models)\n\nLimits depend on your **usage tier** (Free, Tier 1 through Tier 5), which you graduate through automatically based on cumulative spend and account age.\n\nApproximate examples (verify at https://platform.openai.com/docs/guides/rate-limits):\n- **Tier 1** (\u2265 $5 paid): e.g., gpt-4o ~500 RPM, ~30,000 TPM\n- **Tier 5** ($1,000+ paid, 30+ days): e.g., gpt-4o ~10,000 RPM, ~30M TPM\n\nResponse headers include `x-ratelimit-remaining-requests` and `x-ratelimit-remaining-tokens` so you can monitor usage programmatically.\n\n### Pricing (per 1M tokens \u2014 verify current prices at https://openai.com/api/pricing/)\n\nRough indicative pricing (subject to change):\n\n| Model | Input | Output |\n|---|---|---|\n| gpt-4o | ~$2.50 | ~$10.00 |\n| gpt-4o-mini | ~$0.15 | ~$0.60 |\n| gpt-4-turbo | ~$10.00 | ~$30.00 |\n| gpt-3.5-turbo | ~$0.50 | ~$1.50 |\n| o1 / o1-mini (reasoning) | higher \u2014 includes hidden reasoning tokens | \u2014 |\n\n**Cost-saving features:**\n- **Prompt caching**: automatic ~50% discount on repeated prefix tokens\n- **Batch API**: 50% discount, 24-hour turnaround\n- **Fine-tuned models**: separate pricing\n\n## 6. Best Practices\n\n1. **Use the cheapest capable model** \u2014 `gpt-4o-mini` handles most tasks for a fraction of the cost.\n2. **Keep a `system` message** to set tone and constraints.\n3. **Count tokens** with `tiktoken` before sending to avoid context-length errors.\n4. **Truncate conversation history** when it grows \u2014 summarize older turns.\n5. **Never hardcode API keys** \u2014 use env vars or a secret manager.\n6. **Set `max_tokens`** to control cost and avoid runaway outputs.\n7. **Implement exponential backoff** for `429` and `5xx` errors (the SDK does this by default for 2 retries).\n8. **Use streaming** for better UX in chat interfaces.\n9. **Use `seed` + low `temperature`** when you need near-deterministic behavior.\n10. **Validate JSON outputs** even when using `response_format` \u2014 use strict JSON schema mode for guarantees.\n\n## 7. Authoritative References to Verify\n\n- API reference: https://platform.openai.com/docs/api-reference/chat\n- Models list: https://platform.openai.com/docs/models\n- Pricing: https://openai.com/api/pricing/\n- Rate limits: https://platform.openai.com/docs/guides/rate-limits\n- Cookbook (more examples): https://cookbook.openai.com/\n- Python SDK changelog: https://github.com/openai/openai-python/releases\n\nThis guide should give you everything needed to build production-ready applications on the Chat Completions API. Let me know if you'd like me to dive deeper into any section \u2014 e.g., token counting, vision (image inputs), or building a full RAG pipeline.",
+  "steps": [
+    {
+      "step_number": 0,
+      "timestamp": 1777390868.9810426,
+      "role": "user",
+      "content": "Research how to use the OpenAI API for chat completions.\n\nYour task:\n1. Find the official OpenAI API documentation\n2. Understand the chat completions endpoint\n3. Learn about parameters (model, messages, temperature, etc.)\n4. Find code examples in Python\n5. Understand rate limits and pricing\n\nProvide a complete guide with working code examples.",
+      "tool_calls": null,
+      "tool_results": [],
+      "metadata": {}
+    },
+    {
+      "step_number": 1,
+      "timestamp": 1777390872.2795455,
+      "role": "assistant",
+      "content": "I'll research the OpenAI API for chat completions by searching for multiple aspects in parallel.",
+      "tool_calls": [
+        {
+          "id": "toolu_bdrk_019maaYZADUYFPkTF4yMorSL",
+          "type": "function",
+          "function": {
+            "name": "web_search",
+            "arguments": "{\"query\": \"OpenAI API chat completions official documentation\"}"
+          }
+        },
+        {
+          "id": "toolu_bdrk_01LqJiUP1ck973C33Hf5N1NQ",
+          "type": "function",
+          "function": {
+            "name": "web_search",
+            "arguments": "{\"query\": \"OpenAI chat completions API parameters model messages temperature\"}"
+          }
+        },
+        {
+          "id": "toolu_bdrk_011gfYtTNWbqBinxiFFhMdNu",
+          "type": "function",
+          "function": {
+            "name": "web_search",
+            "arguments": "{\"query\": \"OpenAI chat completions Python code example 2024\"}"
+          }
+        },
+        {
+          "id": "toolu_bdrk_015MNen9SYwReLHU2XYwBLqF",
+          "type": "function",
+          "function": {
+            "name": "web_search",
+            "arguments": "{\"query\": \"OpenAI API rate limits pricing tiers GPT-4\"}"
+          }
+        }
+      ],
+      "tool_results": [
+        {
+          "success": true,
+          "output": "Web search for: OpenAI API chat completions official documentation\n[Real search API not configured]",
+          "error": null,
+          "metadata": {
+            "query": "OpenAI API chat completions official documentation",
+            "num_results": 5
+          }
+        },
+        {
+          "success": true,
+          "output": "Web search for: OpenAI chat completions API parameters model messages temperature\n[Real search API not configured]",
+          "error": null,
+          "metadata": {
+            "query": "OpenAI chat completions API parameters model messages temperature",
+            "num_results": 5
+          }
+        },
+        {
+          "success": true,
+          "output": "Web search for: OpenAI chat completions Python code example 2024\n[Real search API not configured]",
+          "error": null,
+          "metadata": {
+            "query": "OpenAI chat completions Python code example 2024",
+            "num_results": 5
+          }
+        },
+        {
+          "success": true,
+          "output": "Web search for: OpenAI API rate limits pricing tiers GPT-4\n[Real search API not configured]",
+          "error": null,
+          "metadata": {
+            "query": "OpenAI API rate limits pricing tiers GPT-4",
+            "num_results": 5
+          }
+        }
+      ],
+      "metadata": {}
+    },
+    {
+      "step_number": 2,
+      "timestamp": 1777390875.045038,
+      "role": "assistant",
+      "content": "The search tool isn't returning live results in this environment, but I have strong working knowledge of the OpenAI API from training. Let me also search for a few more specific items to try to supplement, then provide a comprehensive guide based on my knowledge.",
+      "tool_calls": [
+        {
+          "id": "toolu_bdrk_011D7D7Nd6QtDCEG4LSkW2MW",
+          "type": "function",
+          "function": {
+            "name": "web_search",
+            "arguments": "{\"query\": \"OpenAI python SDK streaming function calling example\"}"
+          }
+        },
+        {
+          "id": "toolu_bdrk_0161AUQmFxvCbvxdSCkwiLJo",
+          "type": "function",
+          "function": {
+            "name": "web_search",
+            "arguments": "{\"query\": \"OpenAI gpt-4o pricing per token\"}"
+          }
+        }
+      ],
+      "tool_results": [
+        {
+          "success": true,
+          "output": "Web search for: OpenAI python SDK streaming function calling example\n[Real search API not configured]",
+          "error": null,
+          "metadata": {
+            "query": "OpenAI python SDK streaming function calling example",
+            "num_results": 5
+          }
+        },
+        {
+          "success": true,
+          "output": "Web search for: OpenAI gpt-4o pricing per token\n[Real search API not configured]",
+          "error": null,
+          "metadata": {
+            "query": "OpenAI gpt-4o pricing per token",
+            "num_results": 5
+          }
+        }
+      ],
+      "metadata": {}
+    },
+    {
+      "step_number": 3,
+      "timestamp": 1777390904.8294876,
+      "role": "assistant",
+      "content": "The web search tool isn't functional in this environment (it returns \"Real search API not configured\"). I'll provide a comprehensive guide based on my training knowledge of the OpenAI API. Note that pricing and rate limits change frequently, so I'll direct you to the official sources for the latest numbers.\n\n---\n\n# Complete Guide to OpenAI Chat Completions API\n\n> \u26a0\ufe0f **Note on research**: The web search tool was unavailable in this session, so this guide is compiled from my training knowledge. For the most current pricing, model names, and rate limits, always verify at the official sources listed at the bottom.\n\n## 1. Official Documentation\n\n- **Main docs**: https://platform.openai.com/docs/\n- **Chat completions reference**: https://platform.openai.com/docs/api-reference/chat\n- **Guide**: https://platform.openai.com/docs/guides/text-generation\n- **Python SDK (GitHub)**: https://github.com/openai/openai-python\n\n## 2. The Chat Completions Endpoint\n\n**Endpoint**: `POST https://api.openai.com/v1/chat/completions`\n\nThe API takes a list of messages representing a conversation and returns a model-generated response. Each message has a `role` (`system`, `user`, `assistant`, or `tool`) and `content`.\n\nOpenAI now also offers a newer **Responses API** (`/v1/responses`), but Chat Completions remains the most widely used and supported endpoint.\n\n## 3. Key Parameters\n\n| Parameter | Type | Description |\n|---|---|---|\n| `model` | string (required) | e.g. `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo`, `gpt-3.5-turbo` |\n| `messages` | array (required) | Conversation history as `{\"role\": ..., \"content\": ...}` |\n| `temperature` | float (0\u20132) | Randomness. Lower = deterministic, higher = creative. Default 1 |\n| `top_p` | float (0\u20131) | Nucleus sampling alternative to temperature |\n| `max_tokens` / `max_completion_tokens` | int | Cap on output tokens |\n| `n` | int | How many completions to generate |\n| `stream` | bool | Stream tokens via server-sent events |\n| `stop` | string/array | Up to 4 stop sequences |\n| `presence_penalty` | float (-2 to 2) | Encourage new topics |\n| `frequency_penalty` | float (-2 to 2) | Discourage repetition |\n| `seed` | int | For (best-effort) reproducibility |\n| `response_format` | object | e.g. `{\"type\": \"json_object\"}` or JSON schema |\n| `tools` | array | Function/tool definitions for tool calling |\n| `tool_choice` | string/object | Control which tool the model calls |\n| `user` | string | End-user ID for abuse monitoring |\n\n## 4. Python Code Examples\n\n### Setup\n\n```bash\npip install openai\nexport OPENAI_API_KEY=\"sk-...\"\n```\n\n### Basic Example\n\n```python\nfrom openai import OpenAI\n\nclient = OpenAI()  # reads OPENAI_API_KEY from env\n\nresponse = client.chat.completions.create(\n    model=\"gpt-4o-mini\",\n    messages=[\n        {\"role\": \"system\", \"content\": \"You are a helpful assistant.\"},\n        {\"role\": \"user\", \"content\": \"Explain quantum entanglement in one sentence.\"}\n    ],\n    temperature=0.7,\n    max_tokens=200,\n)\n\nprint(response.choices[0].message.content)\nprint(\"Tokens used:\", response.usage.total_tokens)\n```\n\n### Multi-Turn Conversation\n\n```python\nconversation = [\n    {\"role\": \"system\", \"content\": \"You are a concise Python tutor.\"}\n]\n\ndef chat(user_input):\n    conversation.append({\"role\": \"user\", \"content\": user_input})\n    resp = client.chat.completions.create(\n        model=\"gpt-4o-mini\",\n        messages=conversation,\n    )\n    reply = resp.choices[0].message.content\n    conversation.append({\"role\": \"assistant\", \"content\": reply})\n    return reply\n\nprint(chat(\"What is a list comprehension?\"))\nprint(chat(\"Show me an example.\"))  # Model remembers context\n```\n\n### Streaming Responses\n\n```python\nstream = client.chat.completions.create(\n    model=\"gpt-4o-mini\",\n    messages=[{\"role\": \"user\", \"content\": \"Write a haiku about the ocean.\"}],\n    stream=True,\n)\n\nfor chunk in stream:\n    delta = chunk.choices[0].delta.content\n    if delta:\n        print(delta, end=\"\", flush=True)\nprint()\n```\n\n### Structured JSON Output\n\n```python\nresponse = client.chat.completions.create(\n    model=\"gpt-4o-mini\",\n    messages=[\n        {\"role\": \"system\", \"content\": \"Return JSON only.\"},\n        {\"role\": \"user\", \"content\": \"List 3 primary colors with hex codes.\"}\n    ],\n    response_format={\"type\": \"json_object\"},\n)\n\nimport json\ndata = json.loads(response.choices[0].message.content)\nprint(data)\n```\n\n### Function / Tool Calling\n\n```python\nimport json\n\ntools = [{\n    \"type\": \"function\",\n    \"function\": {\n        \"name\": \"get_weather\",\n        \"description\": \"Get current weather for a city\",\n        \"parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\n                \"city\": {\"type\": \"string\"},\n                \"unit\": {\"type\": \"string\", \"enum\": [\"celsius\", \"fahrenheit\"]}\n            },\n            \"required\": [\"city\"]\n        }\n    }\n}]\n\ndef get_weather(city, unit=\"celsius\"):\n    return {\"city\": city, \"temp\": 22, \"unit\": unit, \"condition\": \"sunny\"}\n\nmessages = [{\"role\": \"user\", \"content\": \"What's the weather in Paris?\"}]\n\nresp = client.chat.completions.create(\n    model=\"gpt-4o-mini\",\n    messages=messages,\n    tools=tools,\n)\n\nmsg = resp.choices[0].message\nif msg.tool_calls:\n    messages.append(msg)  # assistant message with tool_calls\n    for call in msg.tool_calls:\n        args = json.loads(call.function.arguments)\n        result = get_weather(**args)\n        messages.append({\n            \"role\": \"tool\",\n            \"tool_call_id\": call.id,\n            \"content\": json.dumps(result),\n        })\n\n    final = client.chat.completions.create(\n        model=\"gpt-4o-mini\",\n        messages=messages,\n    )\n    print(final.choices[0].message.content)\n```\n\n### Error Handling & Retries\n\n```python\nfrom openai import OpenAI, RateLimitError, APIError\nimport time\n\nclient = OpenAI()\n\ndef chat_with_retry(messages, retries=3):\n    for i in range(retries):\n        try:\n            return client.chat.completions.create(\n                model=\"gpt-4o-mini\",\n                messages=messages,\n            )\n        except RateLimitError:\n            wait = 2 ** i\n            print(f\"Rate limited. Waiting {wait}s...\")\n            time.sleep(wait)\n        except APIError as e:\n            print(f\"API error: {e}\")\n            raise\n    raise RuntimeError(\"Max retries exceeded\")\n```\n\n### Async Usage\n\n```python\nimport asyncio\nfrom openai import AsyncOpenAI\n\naclient = AsyncOpenAI()\n\nasync def ask(q):\n    r = await aclient.chat.completions.create(\n        model=\"gpt-4o-mini\",\n        messages=[{\"role\": \"user\", \"content\": q}],\n    )\n    return r.choices[0].message.content\n\nasync def main():\n    answers = await asyncio.gather(\n        ask(\"Capital of France?\"),\n        ask(\"Capital of Japan?\"),\n        ask(\"Capital of Brazil?\"),\n    )\n    print(answers)\n\nasyncio.run(main())\n```\n\n## 5. Rate Limits & Pricing\n\n### Rate Limits\n\nRate limits are enforced along **five dimensions**:\n- RPM (requests per minute)\n- RPD (requests per day)\n- TPM (tokens per minute)\n- TPD (tokens per day)\n- IPM (images per minute, for image models)\n\nLimits depend on your **usage tier** (Free, Tier 1 through Tier 5), which you graduate through automatically based on cumulative spend and account age.\n\nApproximate examples (verify at https://platform.openai.com/docs/guides/rate-limits):\n- **Tier 1** (\u2265 $5 paid): e.g., gpt-4o ~500 RPM, ~30,000 TPM\n- **Tier 5** ($1,000+ paid, 30+ days): e.g., gpt-4o ~10,000 RPM, ~30M TPM\n\nResponse headers include `x-ratelimit-remaining-requests` and `x-ratelimit-remaining-tokens` so you can monitor usage programmatically.\n\n### Pricing (per 1M tokens \u2014 verify current prices at https://openai.com/api/pricing/)\n\nRough indicative pricing (subject to change):\n\n| Model | Input | Output |\n|---|---|---|\n| gpt-4o | ~$2.50 | ~$10.00 |\n| gpt-4o-mini | ~$0.15 | ~$0.60 |\n| gpt-4-turbo | ~$10.00 | ~$30.00 |\n| gpt-3.5-turbo | ~$0.50 | ~$1.50 |\n| o1 / o1-mini (reasoning) | higher \u2014 includes hidden reasoning tokens | \u2014 |\n\n**Cost-saving features:**\n- **Prompt caching**: automatic ~50% discount on repeated prefix tokens\n- **Batch API**: 50% discount, 24-hour turnaround\n- **Fine-tuned models**: separate pricing\n\n## 6. Best Practices\n\n1. **Use the cheapest capable model** \u2014 `gpt-4o-mini` handles most tasks for a fraction of the cost.\n2. **Keep a `system` message** to set tone and constraints.\n3. **Count tokens** with `tiktoken` before sending to avoid context-length errors.\n4. **Truncate conversation history** when it grows \u2014 summarize older turns.\n5. **Never hardcode API keys** \u2014 use env vars or a secret manager.\n6. **Set `max_tokens`** to control cost and avoid runaway outputs.\n7. **Implement exponential backoff** for `429` and `5xx` errors (the SDK does this by default for 2 retries).\n8. **Use streaming** for better UX in chat interfaces.\n9. **Use `seed` + low `temperature`** when you need near-deterministic behavior.\n10. **Validate JSON outputs** even when using `response_format` \u2014 use strict JSON schema mode for guarantees.\n\n## 7. Authoritative References to Verify\n\n- API reference: https://platform.openai.com/docs/api-reference/chat\n- Models list: https://platform.openai.com/docs/models\n- Pricing: https://openai.com/api/pricing/\n- Rate limits: https://platform.openai.com/docs/guides/rate-limits\n- Cookbook (more examples): https://cookbook.openai.com/\n- Python SDK changelog: https://github.com/openai/openai-python/releases\n\nThis guide should give you everything needed to build production-ready applications on the Chat Completions API. Let me know if you'd like me to dive deeper into any section \u2014 e.g., token counting, vision (image inputs), or building a full RAG pipeline.",
+      "tool_calls": null,
+      "tool_results": [],
+      "metadata": {}
+    }
+  ],
+  "metadata": {}
+}
