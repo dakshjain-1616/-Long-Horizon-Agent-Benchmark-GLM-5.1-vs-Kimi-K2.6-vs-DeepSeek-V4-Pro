@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" font-family="-apple-system, system-ui, Segoe UI, Roboto, sans-serif" font-size="13" width="960" height="560" fill="#0f172a">
   <rect data-bg="true" x="0" y="0" width="960" height="560" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
   <text x="480" y="30" text-anchor="middle" font-weight="700" font-size="18" fill="#111827">Quality vs Tool-Call Count — what we measure</text>
-  <text x="480" y="50" text-anchor="middle" fill="#6b7280">GLM-5.1 claims to keep improving past 50 tool calls. The benchmark verifies this independently.</text>
+  <text x="480" y="50" text-anchor="middle" fill="#6b7280">Kimi K2.6 vs DeepSeek V4-Pro vs Claude Opus 4.7 — quality vs tool-call count, judged by GPT-5.5.</text>
 
   <!-- axes -->
   <g stroke="#1f2937" stroke-width="1.5">
@@ -61,10 +61,10 @@
         fill="none" stroke="#3b82f6" stroke-width="2.5"/>
   <text x="900" y="92" text-anchor="end" font-weight="700" fill="#1e3a8a">DeepSeek V4-Pro</text>
 
-  <!-- GLM-5.1 (green) — claim: continues improving long after others plateau -->
+  <!-- Claude Opus 4.7 (green) — frontier reasoning baseline -->
   <path d="M100,450 C140,425 240,310 380,200 S620,105 800,90 S880,85 900,82"
         fill="none" stroke="#10b981" stroke-width="3"/>
-  <text x="900" y="80" text-anchor="end" font-weight="700" fill="#065f46">GLM-5.1 (claim)</text>
+  <text x="900" y="80" text-anchor="end" font-weight="700" fill="#065f46">Claude Opus 4.7</text>
 
   <!-- annotation arrows -->
   <line x1="260" y1="200" x2="260" y2="160" stroke="#581c87" stroke-width="1.2"/>

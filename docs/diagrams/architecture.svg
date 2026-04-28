@@ -12,7 +12,7 @@
   </defs>
 
   <text x="480" y="28" text-anchor="middle" font-weight="700" font-size="18" fill="#111827">Long-Horizon Agent Benchmark — Architecture</text>
-  <text x="480" y="48" text-anchor="middle" fill="#6b7280">20 tasks · 4 categories · agent loop with 4 MCP-style tools · 3 frontier models</text>
+  <text x="480" y="48" text-anchor="middle" fill="#6b7280">20 tasks · 4 categories · agent loop with 4 MCP-style tools · 3 frontier models · GPT-5.5 judge</text>
 
   <!-- 20 tasks -->
   <rect x="30" y="80" width="200" height="200" rx="10" fill="url(#lA)" stroke="#1f2937"/>
@@ -41,8 +41,8 @@
 
   <!-- 3 model clients -->
   <rect x="570" y="80" width="240" height="50" rx="8" fill="url(#lD)" stroke="#1f2937"/>
-  <text fill="#111827" x="690" y="100" text-anchor="middle" font-weight="600">GLMClient — z-ai/glm-5.1</text>
-  <text x="690" y="118" text-anchor="middle" fill="#374151" font-size="11">744B MoE · 40B active · 203K ctx</text>
+  <text fill="#111827" x="690" y="100" text-anchor="middle" font-weight="600">OpusClient — anthropic/claude-opus-4-7</text>
+  <text x="690" y="118" text-anchor="middle" fill="#374151" font-size="11">Claude Opus 4.7 · 200K ctx · judge: GPT-5.5</text>
 
   <rect x="570" y="145" width="240" height="50" rx="8" fill="url(#lD)" stroke="#1f2937"/>
   <text fill="#111827" x="690" y="165" text-anchor="middle" font-weight="600">KimiClient — moonshotai/kimi-k2.6</text>

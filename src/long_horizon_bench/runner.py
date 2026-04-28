@@ -148,10 +148,11 @@ class AgentRunner:
             step_data.tool_results = tool_results
             trace.steps.append(step_data)
 
-            for result in tool_results:
+            for call, result in zip(response.message.tool_calls, tool_results):
                 tool_message = Message(
                     role="tool",
                     content=result.output if result.success else result.error,
+                    tool_call_id=call.get("id"),
                 )
                 messages.append(tool_message)
 

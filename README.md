@@ -1,4 +1,4 @@
-# Long-Horizon Agent Benchmark — GLM-5.1 vs Kimi K2.6 vs DeepSeek V4-Pro
+# Long-Horizon Agent Benchmark — Claude Opus 4.7 vs Kimi K2.6 vs DeepSeek V4-Pro (judged by GPT-5.5)
 
 > Made Autonomously Using **[NEO](https://heyneo.com)** — Your Autonomous AI Engineering Agent
 
@@ -13,11 +13,13 @@ The first systematic benchmark of **long-horizon agent productivity** — how we
 
 **Models compared (April 2026):**
 
-- **`THUDM/GLM-5.1`** — Zhipu AI's MoE flagship (744B total, 40B active, MIT). Architected to stay productive across hundreds of rounds and thousands of tool calls.
-- **`moonshotai/Kimi-K2.6`** — Moonshot AI, 1.1T params.
-- **`deepseek-v4-pro`** — DeepSeek, 1.6T params.
+- **`anthropic/claude-opus-4-7`** — Anthropic's frontier reasoning model (Claude Opus 4.7, 200K context).
+- **`moonshotai/Kimi-K2.6`** — Moonshot AI, 1.1T params, 256K context.
+- **`deepseek/deepseek-v4-pro`** — DeepSeek, 1.6T params, 1M context.
 
-GLM-5.1's vendor claim — "keeps improving as task length grows" — has not been independently verified. This project does that verification by running 20 long-horizon tasks (50+ tool calls each) on all three models and plotting **quality vs tool-call count** curves per model. Every prompt, trace, and score is exported as a HuggingFace-format dataset.
+**Judge:** every final answer is scored by **`openai/gpt-5.5`** via OpenRouter — an independent third-party model rates correctness, completeness and quality on a 0–1 scale, so the leaderboard is not graded by any of the contestants.
+
+The benchmark runs 20 long-horizon tasks across 4 categories (refactoring, research, data analysis, debugging) on all three models and plots **quality vs tool-call count** curves per model. Every prompt, trace, judge rationale, and score is exported as a HuggingFace-format dataset.
 
 ## Architecture
 
@@ -25,7 +27,7 @@ GLM-5.1's vendor claim — "keeps improving as task length grows" — has not be
 
 ### What the benchmark measures
 
-GLM-5.1's vendor claim — *"keeps improving as task length grows"* — is the central thing this project verifies. Most models plateau and start hallucinating after 10–20 tool calls; the benchmark plots **quality vs tool-call count** for each model on the same 20 tasks:
+The central question: do frontier agents actually *keep getting better* as a task grows past 50 tool calls, or do they plateau and start hallucinating around step 10–20? The benchmark plots **quality vs tool-call count** for each model on the same 20 tasks, with every final answer scored by an independent GPT-5.5 judge:
 
 ![Quality vs Tool-Call Count](docs/diagrams/quality-vs-calls.svg)
 
@@ -34,8 +36,8 @@ GLM-5.1's vendor claim — *"keeps improving as task length grows"* — is the c
 - **Python**: 3.10 or newer
 - **OS**: Linux, macOS, or WSL2
 - **One API key** (only for real runs; not needed for `--mock`):
-  - **Recommended:** `OPENROUTER_API_KEY` from [openrouter.ai/keys](https://openrouter.ai/keys) — a single key works for all three models.
-  - Alternative direct keys: `GLM_API_KEY` ([open.bigmodel.cn](https://open.bigmodel.cn)), `KIMI_API_KEY` ([platform.moonshot.cn](https://platform.moonshot.cn/)), `DEEPSEEK_API_KEY` ([platform.deepseek.com](https://platform.deepseek.com/)).
+  - **Recommended:** `OPENROUTER_API_KEY` from [openrouter.ai/keys](https://openrouter.ai/keys) — a single key works for all three contestants *and* the GPT-5.5 judge.
+  - Alternative direct keys: `ANTHROPIC_API_KEY` ([console.anthropic.com](https://console.anthropic.com/)), `KIMI_API_KEY` ([platform.moonshot.cn](https://platform.moonshot.cn/)), `DEEPSEEK_API_KEY` ([platform.deepseek.com](https://platform.deepseek.com/)).
 - **Disk**: ~500MB for parquet trace exports
 
 ## Installation
@@ -51,12 +53,11 @@ cp .env.example .env          # then edit values
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `OPENROUTER_API_KEY` | — | **Recommended.** One key for GLM-5.1, Kimi-K2.6, and DeepSeek V4-Pro (plus many more frontier models). When set, all three clients route through OpenRouter automatically. |
+| `OPENROUTER_API_KEY` | — | **Recommended.** One key for Claude Opus 4.7, Kimi K2.6, DeepSeek V4-Pro, *and* the GPT-5.5 judge. When set, every client and the judge route through OpenRouter automatically. |
 | `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` | Override for proxies. |
-| `GLM_API_KEY` | — | Optional fallback for direct Zhipu calls. |
+| `ANTHROPIC_API_KEY` | — | Optional fallback for direct Claude Opus 4.7 calls. |
 | `KIMI_API_KEY` | — | Optional fallback for direct Moonshot calls. |
 | `DEEPSEEK_API_KEY` | — | Optional fallback for direct DeepSeek calls. |
-| `GLM_BASE_URL` | `https://open.bigmodel.cn/api/paas/v4` | Direct Zhipu endpoint (only used without OpenRouter). |
 | `KIMI_BASE_URL` | `https://api.moonshot.cn/v1` | Direct Moonshot endpoint. |
 | `DEEPSEEK_BASE_URL` | `https://api.deepseek.com/v1` | Direct DeepSeek endpoint. |
 | `OUTPUT_DIR` | `outputs/` | Where plots/results land. |
@@ -76,13 +77,29 @@ lhb list-models
 ### Run a single task in mock mode (no API keys needed)
 
 ```bash
-lhb run -m kimi-k2.6 -t refactor_function --mock -o outputs/single_run.json
+lhb run -m opus-4.7 -t refactor_function --mock -o outputs/single_run.json
+```
+
+### Run a single task with the live GPT-5.5 judge
+
+```bash
+lhb run -m opus-4.7 -t refactor_function \
+  --judge openai/gpt-5.5 \
+  -o outputs/opus_refactor.json
 ```
 
 ### Run the full benchmark in mock mode
 
 ```bash
 lhb benchmark -m kimi-k2.6 --mock -o outputs/
+```
+
+### Run the full benchmark live, judged by GPT-5.5
+
+```bash
+lhb benchmark -m opus-4.7        --judge openai/gpt-5.5 -o outputs/bench_opus
+lhb benchmark -m kimi-k2.6       --judge openai/gpt-5.5 -o outputs/bench_kimi
+lhb benchmark -m deepseek-v4-pro --judge openai/gpt-5.5 -o outputs/bench_deepseek
 ```
 
 Add `-c refactoring` (or `research`, `data_analysis`, `debugging`) to filter to a single category.
@@ -120,7 +137,7 @@ The CLI is the public interface. Console script: `lhb`.
 
 ```json
 {
-  "model": "THUDM/GLM-5.1",
+  "model": "anthropic/claude-opus-4-7",
   "task_id": "refactoring-001",
   "task_category": "refactoring",
   "tool_calls": 67,
@@ -139,11 +156,12 @@ The CLI is the public interface. Console script: `lhb`.
 
 ## Models Used
 
-| Model | OpenRouter ID | Direct endpoint | Input $/M | Output $/M | Context | Notes |
+| Model | Role | OpenRouter ID | Direct endpoint | Input $/M | Output $/M | Context |
 |---|---|---|---|---|---|---|
-| **GLM-5.1** | `z-ai/glm-5.1` | `https://open.bigmodel.cn/api/paas/v4` | $1.05 | $3.50 | 203K | Z.ai April 2026 flagship; the model the benchmark is *about*. |
-| **Kimi K2.6** | `moonshotai/kimi-k2.6` | `https://api.moonshot.cn/v1` | $0.7448 | $4.655 | 256K | Moonshot AI, 1.1T params, April 2026 reference comparison. |
-| **DeepSeek V4-Pro** | `deepseek/deepseek-v4-pro` | `https://api.deepseek.com/v1` | $0.435 | $0.87 | 1M | DeepSeek, 1.6T params, April 2026 reference comparison. |
+| **Claude Opus 4.7** | contestant | `anthropic/claude-opus-4-7` | `https://api.anthropic.com/v1` | $5.00 | $25.00 | 200K |
+| **Kimi K2.6** | contestant | `moonshotai/kimi-k2.6` | `https://api.moonshot.cn/v1` | $0.7448 | $4.655 | 256K |
+| **DeepSeek V4-Pro** | contestant | `deepseek/deepseek-v4-pro` | `https://api.deepseek.com/v1` | $0.435 | $0.87 | 1M |
+| **GPT-5.5** | judge | `openai/gpt-5.5` | `https://api.openai.com/v1` | $5.00 | $30.00 | — |
 
 Pricing verified live on OpenRouter (April 2026). Detailed sources in [`MODELS.md`](MODELS.md). No other models are referenced anywhere in code, config, comments, or docs.
 
@@ -178,9 +196,10 @@ long-horizon-agent-bench/
 │   ├── runner.py                 # BenchmarkRunner — agent loop
 │   ├── models/
 │   │   ├── base.py               # BaseModelClient + MockModelClient
-│   │   ├── glm.py                # GLMClient (THUDM/GLM-5.1)
+│   │   ├── opus.py               # OpusClient (anthropic/claude-opus-4-7)
 │   │   ├── kimi.py               # KimiClient (moonshotai/Kimi-K2.6)
-│   │   └── deepseek.py           # DeepSeekClient (deepseek-v4-pro)
+│   │   └── deepseek.py           # DeepSeekClient (deepseek/deepseek-v4-pro)
+│   ├── judge.py                  # GPT-5.5 LLM judge (OpenRouter)
 │   ├── tools/
 │   │   ├── base.py               # Abstract Tool with JSON schema validation
 │   │   ├── file_edit.py

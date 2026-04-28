@@ -4,12 +4,13 @@ A production-ready benchmark for evaluating long-horizon agent capabilities acro
 
 ## Overview
 
-This benchmark evaluates agent performance on 20 tasks spanning refactoring, research, data analysis, and debugging. It supports multiple model providers (GLM-5.1, Kimi K2.6, DeepSeek V4-Pro) with comprehensive metrics, visualization, and dataset generation.
+This benchmark evaluates agent performance on 20 tasks spanning refactoring, research, data analysis, and debugging. It pits three frontier model providers (Claude Opus 4.7, Kimi K2.6, DeepSeek V4-Pro) against each other and grades every final answer with an independent **GPT-5.5 judge**.
 
 ## Features
 
 - **20 Tasks**: Covering refactoring, research, data analysis, and debugging
-- **3 Model Providers**: GLM-5.1, Kimi K2.6, DeepSeek V4-Pro
+- **3 Contestant Models**: Claude Opus 4.7, Kimi K2.6, DeepSeek V4-Pro
+- **GPT-5.5 Judge**: independent third-party scoring on a 0–1 scale
 - **4 Tools**: File edit, web search, shell execution, code search
 - **Comprehensive Metrics**: Quality vs tool calls, cost tracking, success rates
 - **Visualization**: Quality plots, cost distribution, success rates by category

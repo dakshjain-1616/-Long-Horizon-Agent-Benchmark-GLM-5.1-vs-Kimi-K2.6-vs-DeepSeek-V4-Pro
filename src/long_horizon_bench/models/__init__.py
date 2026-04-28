@@ -11,6 +11,7 @@ from .base import (
 from .deepseek import DeepSeekClient
 from .glm import GLMClient
 from .kimi import KimiClient
+from .opus import OpusClient
 
 __all__ = [
     "BaseModelClient",
@@ -22,4 +23,5 @@ __all__ = [
     "GLMClient",
     "KimiClient",
     "DeepSeekClient",
+    "OpusClient",
 ]

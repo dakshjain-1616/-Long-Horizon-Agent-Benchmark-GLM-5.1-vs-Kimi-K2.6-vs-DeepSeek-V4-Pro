@@ -19,7 +19,8 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from .metrics import BenchmarkResult, TaskMetrics
-from .models import DeepSeekClient, GLMClient, KimiClient, MockModelClient
+from .judge import judge_output
+from .models import DeepSeekClient, GLMClient, KimiClient, MockModelClient, OpusClient
 from .plots import generate_all_plots
 from .runner import AgentRunner
 from .tasks import TASKS
@@ -32,10 +33,10 @@ _OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 # Map our short model ids to (direct base URL, OpenRouter model id, direct env var).
 _MODEL_REGISTRY: dict[str, tuple[str, str, str]] = {
-    "glm-5.1": (
-        "https://open.bigmodel.cn/api/paas/v4",
-        "z-ai/glm-5.1",  # verified live on OpenRouter (Z.ai is the upstream provider id)
-        "GLM_API_KEY",
+    "opus-4.7": (
+        "https://openrouter.ai/api/v1",
+        "anthropic/claude-opus-4-7",  # verified live on OpenRouter, April 2026: $5/M in, $25/M out
+        "ANTHROPIC_API_KEY",
     ),
     "kimi-k2.6": (
         "https://api.moonshot.cn/v1",
@@ -90,8 +91,8 @@ def get_model_client(model_name: str, api_key: str | None = None, mock_mode: boo
 
     config = _build_model_config(model_name, api_key)
 
-    if model_name == "glm-5.1":
-        return GLMClient(config)
+    if model_name == "opus-4.7":
+        return OpusClient(config)
     if model_name == "kimi-k2.6":
         return KimiClient(config)
     if model_name == "deepseek-v4-pro":
@@ -107,12 +108,13 @@ def cli():
 
 
 @cli.command()
-@click.option("--model", "-m", required=True, help="Model to use (glm-5.1, kimi-k2.6, deepseek-v4-pro)")
+@click.option("--model", "-m", required=True, help="Model to use (opus-4.7, kimi-k2.6, deepseek-v4-pro)")
 @click.option("--task", "-t", required=True, help="Task ID to run")
 @click.option("--mock", is_flag=True, help="Run in mock mode")
 @click.option("--output", "-o", type=click.Path(), help="Output file for trace")
 @click.option("--max-steps", default=50, help="Maximum steps to run")
-def run(model: str, task: str, mock: bool, output: str | None, max_steps: int):
+@click.option("--judge", "judge_model", default=None, help="LLM judge model id (e.g. openai/gpt-5.5).")
+def run(model: str, task: str, mock: bool, output: str | None, max_steps: int, judge_model: str | None):
     """Run a single task."""
     if task not in TASKS:
         console.print(f"[red]Error: Unknown task '{task}'[/red]")
@@ -152,12 +154,41 @@ def run(model: str, task: str, mock: bool, output: str | None, max_steps: int):
             progress.update(task_progress, completed=True)
 
             console.print(f"\n[green]Task completed: {trace.success}[/green]")
-            console.print(f"Total tokens: {trace.total_tokens}")
-            console.print(f"Total cost: ${trace.total_cost:.4f}")
+            console.print(f"Agent tokens: {trace.total_tokens}")
+            console.print(f"Agent cost: ${trace.total_cost:.4f}")
             console.print(f"Steps: {len(trace.steps)}")
 
+            judge_result = None
+            if judge_model and not mock:
+                console.print(f"\n[cyan]Judging with {judge_model}...[/cyan]")
+                judge_result = await judge_output(
+                    task_prompt=task_def.prompt,
+                    agent_output=trace.final_output or "",
+                    judge_model=judge_model,
+                )
+                console.print(f"Judge score: {judge_result.score:.2f}")
+                console.print(f"Judge rationale: {judge_result.rationale}")
+                console.print(
+                    f"Judge tokens: {judge_result.prompt_tokens} in / {judge_result.completion_tokens} out"
+                )
+                console.print(f"Judge cost: ${judge_result.cost_usd:.4f}")
+                console.print(
+                    f"\n[bold]Total cost (agent + judge): "
+                    f"${trace.total_cost + judge_result.cost_usd:.4f}[/bold]"
+                )
+
             if output:
-                Path(output).write_text(json.dumps(trace.to_dict(), indent=2))
+                payload = trace.to_dict()
+                if judge_result:
+                    payload["judge"] = {
+                        "model": judge_result.model,
+                        "score": judge_result.score,
+                        "rationale": judge_result.rationale,
+                        "prompt_tokens": judge_result.prompt_tokens,
+                        "completion_tokens": judge_result.completion_tokens,
+                        "cost_usd": judge_result.cost_usd,
+                    }
+                Path(output).write_text(json.dumps(payload, indent=2))
                 console.print(f"Trace saved to: {output}")
 
             return trace
@@ -170,7 +201,8 @@ def run(model: str, task: str, mock: bool, output: str | None, max_steps: int):
 @click.option("--category", "-c", help="Filter by category")
 @click.option("--mock", is_flag=True, help="Run in mock mode")
 @click.option("--output", "-o", type=click.Path(), help="Output directory for results")
-def benchmark(model: str, category: str | None, mock: bool, output: str | None):
+@click.option("--judge", "judge_model", default=None, help="LLM judge model id (e.g. openai/gpt-5.5).")
+def benchmark(model: str, category: str | None, mock: bool, output: str | None, judge_model: str | None):
     """Run benchmark on all tasks."""
     tasks_to_run = {k: v for k, v in TASKS.items() if not category or v.category == category}
 
@@ -204,12 +236,48 @@ def benchmark(model: str, category: str | None, mock: bool, output: str | None):
                     mock_mode=mock,
                 )
 
-                trace = await runner.run(
-                    task_id=task_id,
-                    prompt=task_def.prompt,
-                )
+                try:
+                    trace = await runner.run(
+                        task_id=task_id,
+                        prompt=task_def.prompt,
+                    )
+                except Exception as exc:
+                    console.print(f"[red]Task {task_id} failed: {exc}[/red]")
+                    failed_metrics = TaskMetrics(
+                        task_id=task_id,
+                        model_name=model,
+                        success=False,
+                        quality_score=0.0,
+                        num_tool_calls=0,
+                        total_tokens=0,
+                        total_cost=0.0,
+                        execution_time=0.0,
+                        metadata={"error": str(exc)[:500]},
+                    )
+                    result.add_result(failed_metrics)
+                    progress.advance(task_progress)
+                    continue
 
                 quality_score = task_def.grade(trace.final_output) if task_def.expected_output else 0.5
+                judge_meta: dict = {}
+                judge_cost = 0.0
+                if judge_model and not mock:
+                    try:
+                        jr = await judge_output(
+                            task_prompt=task_def.prompt,
+                            agent_output=trace.final_output or "",
+                            judge_model=judge_model,
+                        )
+                        quality_score = jr.score
+                        judge_cost = jr.cost_usd
+                        judge_meta = {
+                            "judge_model": jr.model,
+                            "judge_score": jr.score,
+                            "judge_rationale": jr.rationale,
+                            "judge_cost_usd": jr.cost_usd,
+                        }
+                    except Exception as e:
+                        judge_meta = {"judge_error": str(e)}
 
                 task_metrics = TaskMetrics(
                     task_id=task_id,
@@ -218,8 +286,9 @@ def benchmark(model: str, category: str | None, mock: bool, output: str | None):
                     quality_score=quality_score,
                     num_tool_calls=sum(1 for s in trace.steps if s.tool_results),
                     total_tokens=trace.total_tokens,
-                    total_cost=trace.total_cost,
+                    total_cost=trace.total_cost + judge_cost,
                     execution_time=(trace.end_time or 0) - trace.start_time,
+                    metadata=judge_meta,
                 )
                 result.add_result(task_metrics)
                 progress.advance(task_progress)
@@ -240,8 +309,29 @@ def benchmark(model: str, category: str | None, mock: bool, output: str | None):
             output_path = Path(output)
             output_path.mkdir(parents=True, exist_ok=True)
 
+            full_payload = {
+                "summary": summary,
+                "model_name": model,
+                "task_results": [
+                    {
+                        "task_id": r.task_id,
+                        "model_name": r.model_name,
+                        "success": r.success,
+                        "quality_score": r.quality_score,
+                        "num_tool_calls": r.num_tool_calls,
+                        "total_tokens": r.total_tokens,
+                        "total_cost": r.total_cost,
+                        "execution_time": r.execution_time,
+                        "metadata": r.metadata,
+                    }
+                    for r in result.task_results
+                ],
+            }
+            results_filename = f"results_{model}.json"
+            with open(output_path / results_filename, "w") as f:
+                json.dump(full_payload, f, indent=2, default=str)
             with open(output_path / "results.json", "w") as f:
-                json.dump(summary, f, indent=2)
+                json.dump(summary, f, indent=2, default=str)
 
             generate_all_plots(result, str(output_path))
             console.print(f"\nResults saved to: {output}")
@@ -282,7 +372,7 @@ def list_models():
     table.add_column("Output Price", style="yellow")
 
     models = [
-        ("glm-5.1", "GLM-5.1", "$1.05/M", "$3.50/M"),
+        ("opus-4.7", "Claude Opus 4.7", "$5.00/M", "$25.00/M"),
         ("kimi-k2.6", "Kimi K2.6", "$0.7448/M", "$4.655/M"),
         ("deepseek-v4-pro", "DeepSeek V4-Pro", "$0.435/M", "$0.87/M"),
     ]
