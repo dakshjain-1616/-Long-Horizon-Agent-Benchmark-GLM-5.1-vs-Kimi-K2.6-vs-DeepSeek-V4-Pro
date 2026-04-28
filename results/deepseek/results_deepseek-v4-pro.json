@@ -2,19 +2,19 @@
   "summary": {
     "model_name": "deepseek-v4-pro",
     "total_tasks": 20,
-    "successful_tasks": 16,
-    "success_rate": 0.8,
+    "successful_tasks": 17,
+    "success_rate": 0.85,
     "avg_quality_score": 0.7,
     "std_quality_score": 0.45825756949558394,
     "min_quality_score": 0.0,
     "max_quality_score": 1.0,
-    "avg_tool_calls": 0.85,
-    "std_tool_calls": 1.3143439428094916,
-    "total_tool_calls": 17,
-    "total_cost": 0.040347555,
-    "avg_cost": 0.00201737775,
-    "avg_execution_time": 65.48650499582291,
-    "total_execution_time": 1309.7300999164581
+    "avg_tool_calls": 1.75,
+    "std_tool_calls": 2.299456457513384,
+    "total_tool_calls": 35,
+    "total_cost": 0.0874611,
+    "avg_cost": 0.004373055,
+    "avg_execution_time": 193.286918759346,
+    "total_execution_time": 3865.73837518692
   },
   "model_name": "deepseek-v4-pro",
   "task_results": [
@@ -24,9 +24,9 @@
       "success": true,
       "quality_score": 1.0,
       "num_tool_calls": 1,
-      "total_tokens": 3315,
-      "total_cost": 0.0018931199999999999,
-      "execution_time": 35.570743560791016,
+      "total_tokens": 3311,
+      "total_cost": 0.00189051,
+      "execution_time": 148.97285985946655,
       "metadata": {}
     },
     {
@@ -34,10 +34,10 @@
       "model_name": "deepseek-v4-pro",
       "success": true,
       "quality_score": 1.0,
-      "num_tool_calls": 0,
-      "total_tokens": 2189,
-      "total_cost": 0.001632555,
-      "execution_time": 58.95066785812378,
+      "num_tool_calls": 1,
+      "total_tokens": 3426,
+      "total_cost": 0.002279835,
+      "execution_time": 220.17640900611877,
       "metadata": {}
     },
     {
@@ -46,9 +46,9 @@
       "success": true,
       "quality_score": 1.0,
       "num_tool_calls": 1,
-      "total_tokens": 3583,
-      "total_cost": 0.002223285,
-      "execution_time": 92.74061846733093,
+      "total_tokens": 4583,
+      "total_cost": 0.002803575,
+      "execution_time": 216.474538564682,
       "metadata": {}
     },
     {
@@ -57,20 +57,20 @@
       "success": true,
       "quality_score": 1.0,
       "num_tool_calls": 1,
-      "total_tokens": 3441,
-      "total_cost": 0.0023146349999999998,
-      "execution_time": 78.83778643608093,
+      "total_tokens": 3076,
+      "total_cost": 0.00202014,
+      "execution_time": 211.64613795280457,
       "metadata": {}
     },
     {
       "task_id": "add_docstrings",
       "model_name": "deepseek-v4-pro",
       "success": true,
-      "quality_score": 0.0,
-      "num_tool_calls": 1,
-      "total_tokens": 3062,
-      "total_cost": 0.0018309149999999998,
-      "execution_time": 68.60429978370667,
+      "quality_score": 1.0,
+      "num_tool_calls": 0,
+      "total_tokens": 1533,
+      "total_cost": 0.0011018550000000001,
+      "execution_time": 51.35779619216919,
       "metadata": {}
     },
     {
@@ -79,9 +79,9 @@
       "success": true,
       "quality_score": 1.0,
       "num_tool_calls": 1,
-      "total_tokens": 3179,
-      "total_cost": 0.0023550900000000002,
-      "execution_time": 96.47490119934082,
+      "total_tokens": 3351,
+      "total_cost": 0.00250299,
+      "execution_time": 196.83218097686768,
       "metadata": {}
     },
     {
@@ -90,9 +90,9 @@
       "success": true,
       "quality_score": 1.0,
       "num_tool_calls": 1,
-      "total_tokens": 3565,
-      "total_cost": 0.0026622,
-      "execution_time": 121.99652457237244,
+      "total_tokens": 3044,
+      "total_cost": 0.00220893,
+      "execution_time": 95.43495154380798,
       "metadata": {}
     },
     {
@@ -105,7 +105,7 @@
       "total_cost": 0.0,
       "execution_time": 0.0,
       "metadata": {
-        "error": "RetryError[<Future at 0x7ee8fa83d790 state=finished raised HTTPStatusError>]"
+        "error": "Client error '429 Too Many Requests' for url 'https://openrouter.ai/api/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
       }
     },
     {
@@ -114,9 +114,9 @@
       "success": true,
       "quality_score": 1.0,
       "num_tool_calls": 1,
-      "total_tokens": 4624,
-      "total_cost": 0.003572655,
-      "execution_time": 181.32312965393066,
+      "total_tokens": 5017,
+      "total_cost": 0.003911085,
+      "execution_time": 339.81620240211487,
       "metadata": {}
     },
     {
@@ -124,14 +124,36 @@
       "model_name": "deepseek-v4-pro",
       "success": true,
       "quality_score": 1.0,
-      "num_tool_calls": 2,
-      "total_tokens": 3447,
-      "total_cost": 0.002245905,
-      "execution_time": 64.55791401863098,
+      "num_tool_calls": 4,
+      "total_tokens": 5964,
+      "total_cost": 0.003559605,
+      "execution_time": 292.23350954055786,
       "metadata": {}
     },
     {
       "task_id": "analyze_csv",
+      "model_name": "deepseek-v4-pro",
+      "success": true,
+      "quality_score": 0.0,
+      "num_tool_calls": 10,
+      "total_tokens": 73254,
+      "total_cost": 0.03549165,
+      "execution_time": 742.6178302764893,
+      "metadata": {}
+    },
+    {
+      "task_id": "generate_report",
+      "model_name": "deepseek-v4-pro",
+      "success": true,
+      "quality_score": 0.0,
+      "num_tool_calls": 1,
+      "total_tokens": 4627,
+      "total_cost": 0.0028623,
+      "execution_time": 185.74469828605652,
+      "metadata": {}
+    },
+    {
+      "task_id": "clean_data",
       "model_name": "deepseek-v4-pro",
       "success": false,
       "quality_score": 0.0,
@@ -140,30 +162,8 @@
       "total_cost": 0.0,
       "execution_time": 0.0,
       "metadata": {
-        "error": "RetryError[<Future at 0x7ee8f83a6570 state=finished raised HTTPStatusError>]"
+        "error": "Client error '429 Too Many Requests' for url 'https://openrouter.ai/api/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
       }
-    },
-    {
-      "task_id": "generate_report",
-      "model_name": "deepseek-v4-pro",
-      "success": true,
-      "quality_score": 1.0,
-      "num_tool_calls": 0,
-      "total_tokens": 1843,
-      "total_cost": 0.001368945,
-      "execution_time": 46.08394432067871,
-      "metadata": {}
-    },
-    {
-      "task_id": "clean_data",
-      "model_name": "deepseek-v4-pro",
-      "success": true,
-      "quality_score": 1.0,
-      "num_tool_calls": 0,
-      "total_tokens": 1659,
-      "total_cost": 0.001192335,
-      "execution_time": 49.582843542099,
-      "metadata": {}
     },
     {
       "task_id": "statistical_analysis",
@@ -175,21 +175,19 @@
       "total_cost": 0.0,
       "execution_time": 0.0,
       "metadata": {
-        "error": "RetryError[<Future at 0x7ee8f8339fd0 state=finished raised HTTPStatusError>]"
+        "error": "Client error '429 Too Many Requests' for url 'https://openrouter.ai/api/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
       }
     },
     {
       "task_id": "create_visualization",
       "model_name": "deepseek-v4-pro",
-      "success": false,
-      "quality_score": 0.0,
-      "num_tool_calls": 0,
-      "total_tokens": 0,
-      "total_cost": 0.0,
-      "execution_time": 0.0,
-      "metadata": {
-        "error": "RetryError[<Future at 0x7ee8f837dac0 state=finished raised HTTPStatusError>]"
-      }
+      "success": true,
+      "quality_score": 1.0,
+      "num_tool_calls": 4,
+      "total_tokens": 17932,
+      "total_cost": 0.009431235,
+      "execution_time": 416.4075028896332,
+      "metadata": {}
     },
     {
       "task_id": "fix_syntax_error",
@@ -197,9 +195,9 @@
       "success": true,
       "quality_score": 1.0,
       "num_tool_calls": 0,
-      "total_tokens": 981,
-      "total_cost": 0.000607695,
-      "execution_time": 17.222147941589355,
+      "total_tokens": 1053,
+      "total_cost": 0.000670335,
+      "execution_time": 65.39470171928406,
       "metadata": {}
     },
     {
@@ -207,10 +205,10 @@
       "model_name": "deepseek-v4-pro",
       "success": true,
       "quality_score": 1.0,
-      "num_tool_calls": 0,
-      "total_tokens": 954,
-      "total_cost": 0.00058551,
-      "execution_time": 8.881721258163452,
+      "num_tool_calls": 4,
+      "total_tokens": 6241,
+      "total_cost": 0.0032163899999999995,
+      "execution_time": 222.82358264923096,
       "metadata": {}
     },
     {
@@ -219,9 +217,9 @@
       "success": true,
       "quality_score": 1.0,
       "num_tool_calls": 1,
-      "total_tokens": 2114,
-      "total_cost": 0.00122757,
-      "execution_time": 57.07002830505371,
+      "total_tokens": 1957,
+      "total_cost": 0.0010918500000000001,
+      "execution_time": 80.81099605560303,
       "metadata": {}
     },
     {
@@ -229,10 +227,10 @@
       "model_name": "deepseek-v4-pro",
       "success": true,
       "quality_score": 0.0,
-      "num_tool_calls": 6,
-      "total_tokens": 26265,
-      "total_cost": 0.01282467,
-      "execution_time": 217.6968696117401,
+      "num_tool_calls": 3,
+      "total_tokens": 19204,
+      "total_cost": 0.010937205,
+      "execution_time": 298.35638642311096,
       "metadata": {}
     },
     {
@@ -241,9 +239,9 @@
       "success": true,
       "quality_score": 1.0,
       "num_tool_calls": 1,
-      "total_tokens": 2913,
-      "total_cost": 0.0018104700000000002,
-      "execution_time": 114.13595938682556,
+      "total_tokens": 2536,
+      "total_cost": 0.00148161,
+      "execution_time": 80.63809084892273,
       "metadata": {}
     }
   ]

@@ -5,10 +5,27 @@ import time
 from collections.abc import AsyncIterator
 from typing import Any
 
+import asyncio
+import random
+
 import httpx
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import (
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from .base import BaseModelClient, ChatResponse, Message, ModelConfig, Usage
+
+
+def _is_retryable(exc: BaseException) -> bool:
+    if isinstance(exc, (httpx.TransportError, httpx.TimeoutException)):
+        return True
+    if isinstance(exc, httpx.HTTPStatusError):
+        code = exc.response.status_code
+        return code == 429 or 500 <= code < 600
+    return False
 
 
 class DeepSeekClient(BaseModelClient):
@@ -26,7 +43,12 @@ class DeepSeekClient(BaseModelClient):
             timeout=config.timeout_seconds,
         )
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+    @retry(
+        stop=stop_after_attempt(6),
+        wait=wait_exponential(multiplier=2, min=5, max=60),
+        retry=retry_if_exception(_is_retryable),
+        reraise=True,
+    )
     async def chat(self, messages: list[Message], tools: list[dict[str, Any]] | None = None, tool_choice: str | None = None) -> ChatResponse:
         start_time = time.time()
         ds_messages = self._convert_messages(messages)
@@ -42,6 +64,13 @@ class DeepSeekClient(BaseModelClient):
             if tool_choice:
                 payload["tool_choice"] = tool_choice
         response = await self.client.post("/chat/completions", json=payload)
+        if response.status_code == 429:
+            retry_after = response.headers.get("retry-after")
+            if retry_after:
+                try:
+                    await asyncio.sleep(float(retry_after) + random.uniform(0, 1))
+                except ValueError:
+                    pass
         response.raise_for_status()
         data = response.json()
         latency_ms = (time.time() - start_time) * 1000
