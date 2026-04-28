@@ -226,37 +226,24 @@ long-horizon-agent-bench/
 └── README.md (this file)
 ```
 
-## Real run results (April 27, 2026)
+## Real run results (April 28, 2026)
 
-Live verification of the OpenRouter routing for **`deepseek-v4-pro`**, with `OPENROUTER_API_KEY` set in `.env` (the CLI auto-loads it):
+Full benchmark — **20 tasks per model**, run in parallel via `lhb benchmark -j 8`. All raw traces, summary JSONs, and plots live under `results/{opus,kimi,deepseek}/`.
 
-```python
-from long_horizon_bench.cli import _build_model_config
-from long_horizon_bench.models.deepseek import DeepSeekClient
-from long_horizon_bench.models.base import Message
+| Model | Success | Avg quality | Total tool calls | Total cost | Wall time |
+|---|---|---|---|---|---|
+| **Claude Opus 4.7** | 20/20 (100%) | **0.90** | 19 | $1.4921 | 393s |
+| **Kimi K2.6** | 20/20 (100%) | **0.90** | 93 | $0.9199 | 3 135s |
+| **DeepSeek V4-Pro** | 20/20 (100%) | **0.85** | 43 | $0.1056 | 4 735s |
 
-cfg = _build_model_config("deepseek-v4-pro", None)
-client = DeepSeekClient(cfg)
-r = await client.chat([Message(role="user", content="Briefly explain what mypy does, in one sentence.")])
-```
+Headline takeaways:
 
-| Metric | Value |
-|---|---|
-| `cfg.base_url` | `https://openrouter.ai/api/v1` |
-| `cfg.model` (sent) | `deepseek/deepseek-v4-pro` |
-| Resolved upstream model | `deepseek/deepseek-v4-pro-20260423` |
-| Upstream provider | SiliconFlow |
-| HTTP status | `200 OK` |
-| Latency | 14,495 ms |
-| Prompt tokens | 16 |
-| Completion tokens | 101 |
-| Total tokens | 117 |
-| Cost (this call) | $0.000095 |
-| Returned content | *"Mypy is a static type checker for Python that analyzes code with type annotations to catch type errors before execution."* |
+- **Quality**: Opus and Kimi tie at 0.90 avg; DeepSeek lags slightly at 0.85.
+- **Tool-call efficiency**: Opus uses ~5× fewer tool calls than Kimi to reach the same quality.
+- **Cost**: DeepSeek is ~14× cheaper than Opus and ~9× cheaper than Kimi for nearly the same quality.
+- **Wall time**: Opus is ~8× faster than Kimi end-to-end despite no concurrency-side win, because individual calls return faster.
 
-All 70 unit tests pass in mock mode (no key, no network). The live probe above confirms the real OpenRouter route works end-to-end and resolved to a real April-2026 model snapshot.
-
-> Note: OpenRouter's free tier returns `429 temporarily rate-limited upstream` on burst — particularly for tool-bearing requests routed through Io Net. For full multi-task `lhb benchmark` sweeps, add your own paid key at [openrouter.ai/settings/integrations](https://openrouter.ai/settings/integrations) so requests carry your own rate limits.
+> Reproducibility note: DeepSeek's OpenRouter route 429s under burst — the client at `src/long_horizon_bench/models/deepseek.py` retries 6× with 5–60s exponential backoff and honors `Retry-After`. If you still see stragglers, lower `-j` or rerun the affected tasks via `scripts/rerun_failed.py`.
 
 ## Contributing
 

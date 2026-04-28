@@ -1,77 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" font-family="-apple-system, system-ui, Segoe UI, Roboto, sans-serif" font-size="13" width="960" height="560" fill="#0f172a">
-  <rect data-bg="true" x="0" y="0" width="960" height="560" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
-  <text x="480" y="30" text-anchor="middle" font-weight="700" font-size="18" fill="#111827">Quality vs Tool-Call Count — what we measure</text>
-  <text x="480" y="50" text-anchor="middle" fill="#6b7280">Kimi K2.6 vs DeepSeek V4-Pro vs Claude Opus 4.7 — quality vs tool-call count, judged by GPT-5.5.</text>
-
-  <!-- axes -->
-  <g stroke="#1f2937" stroke-width="1.5">
-    <line x1="100" y1="450" x2="900" y2="450"/>
-    <line x1="100" y1="80" x2="100" y2="450"/>
-  </g>
-
-  <!-- y label -->
-  <text x="32" y="265" text-anchor="middle" font-weight="600" fill="#374151" transform="rotate(-90 32 265)">Quality score (0 - 1)</text>
-  <!-- x label -->
-  <text x="500" y="510" text-anchor="middle" font-weight="600" fill="#374151">Tool-call count</text>
-
-  <!-- y ticks -->
-  <g font-size="11" fill="#6b7280" text-anchor="end">
-    <line x1="95" y1="450" x2="100" y2="450" stroke="#1f2937"/><text fill="#111827" x="92" y="454">0.0</text>
-    <line x1="95" y1="376" x2="100" y2="376" stroke="#1f2937"/><text fill="#111827" x="92" y="380">0.2</text>
-    <line x1="95" y1="302" x2="100" y2="302" stroke="#1f2937"/><text fill="#111827" x="92" y="306">0.4</text>
-    <line x1="95" y1="228" x2="100" y2="228" stroke="#1f2937"/><text fill="#111827" x="92" y="232">0.6</text>
-    <line x1="95" y1="154" x2="100" y2="154" stroke="#1f2937"/><text fill="#111827" x="92" y="158">0.8</text>
-    <line x1="95" y1="80" x2="100" y2="80" stroke="#1f2937"/><text fill="#111827" x="92" y="84">1.0</text>
-  </g>
-
-  <!-- x ticks 0..100 -->
-  <g font-size="11" fill="#6b7280" text-anchor="middle">
-    <line x1="100" y1="450" x2="100" y2="455" stroke="#1f2937"/><text fill="#111827" x="100" y="470">0</text>
-    <line x1="260" y1="450" x2="260" y2="455" stroke="#1f2937"/><text fill="#111827" x="260" y="470">20</text>
-    <line x1="420" y1="450" x2="420" y2="455" stroke="#1f2937"/><text fill="#111827" x="420" y="470">40</text>
-    <line x1="580" y1="450" x2="580" y2="455" stroke="#1f2937"/><text fill="#111827" x="580" y="470">60</text>
-    <line x1="740" y1="450" x2="740" y2="455" stroke="#1f2937"/><text fill="#111827" x="740" y="470">80</text>
-    <line x1="900" y1="450" x2="900" y2="455" stroke="#1f2937"/><text fill="#111827" x="900" y="470">100</text>
-  </g>
-
-  <!-- gridlines -->
-  <g stroke="#e5e7eb" stroke-width="1">
-    <line x1="100" y1="376" x2="900" y2="376"/>
-    <line x1="100" y1="302" x2="900" y2="302"/>
-    <line x1="100" y1="228" x2="900" y2="228"/>
-    <line x1="100" y1="154" x2="900" y2="154"/>
-  </g>
-
-  <!-- vertical "plateau zone" annotation -->
-  <rect x="180" y="80" width="140" height="370" fill="#fee2e2" opacity="0.35"/>
-  <text x="250" y="100" text-anchor="middle" font-size="11" fill="#991b1b">10–20 calls: most</text>
-  <text x="250" y="115" text-anchor="middle" font-size="11" fill="#991b1b">models plateau</text>
-
-  <!-- Curves
-       Each path interpolates between (calls, score) sample points.
-       Curves are illustrative — actual numbers populate when you run `make plots`. -->
-
-  <!-- Kimi K2.6 (purple) — plateaus around step 25 -->
-  <path d="M100,450 C140,420 200,260 260,200 S400,165 500,170 S700,180 900,200"
-        fill="none" stroke="#a855f7" stroke-width="2.5"/>
-  <text x="900" y="195" text-anchor="end" font-weight="700" fill="#581c87">Kimi K2.6</text>
-
-  <!-- DeepSeek V4-Pro (blue) — keeps improving slowly -->
-  <path d="M100,450 C140,415 220,290 320,210 S540,130 700,115 S840,100 900,95"
-        fill="none" stroke="#3b82f6" stroke-width="2.5"/>
-  <text x="900" y="92" text-anchor="end" font-weight="700" fill="#1e3a8a">DeepSeek V4-Pro</text>
-
-  <!-- Claude Opus 4.7 (green) — frontier reasoning baseline -->
-  <path d="M100,450 C140,425 240,310 380,200 S620,105 800,90 S880,85 900,82"
-        fill="none" stroke="#10b981" stroke-width="3"/>
-  <text x="900" y="80" text-anchor="end" font-weight="700" fill="#065f46">Claude Opus 4.7</text>
-
-  <!-- annotation arrows -->
-  <line x1="260" y1="200" x2="260" y2="160" stroke="#581c87" stroke-width="1.2"/>
-  <text x="260" y="150" text-anchor="middle" font-size="11" fill="#581c87">plateau begins</text>
-
-  <line x1="700" y1="115" x2="700" y2="60" stroke="#1e3a8a" stroke-width="1.2"/>
-  <text x="700" y="50" text-anchor="middle" font-size="11" fill="#1e3a8a">slow gains continue</text>
-
-  <text x="500" y="540" text-anchor="middle" fill="#6b7280" font-size="11">Curves illustrative. Real numbers populate `outputs/quality_vs_calls.png` once you run `lhb benchmark` on each model.</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" font-family="-apple-system, system-ui, Segoe UI, Roboto, sans-serif" font-size="13" width="960" height="580" fill="#0f172a">
+<rect data-bg="true" x="0" y="0" width="960" height="580" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+<text x="480" y="30" text-anchor="middle" font-weight="700" font-size="18" fill="#111827">Quality vs Tool-Call Count — measured</text>
+<text x="480" y="50" text-anchor="middle" fill="#6b7280">20 tasks · per-task scatter · judged by GPT-5.5 · April 2026</text>
+<g stroke="#1f2937" stroke-width="1.5"><line x1="100" y1="450" x2="900" y2="450"/><line x1="100" y1="80" x2="100" y2="450"/></g>
+<text x="32" y="265" text-anchor="middle" font-weight="600" fill="#374151" transform="rotate(-90 32 265)">Quality score (0 - 1)</text>
+<text x="500" y="510" text-anchor="middle" font-weight="600" fill="#374151">Tool-call count (capped at 50)</text>
+<g font-size="11" fill="#6b7280" text-anchor="end"><line x1="95" y1="450" x2="100" y2="450" stroke="#1f2937"/><text fill="#111827" x="92" y="454">0.0</text><line x1="95" y1="376" x2="100" y2="376" stroke="#1f2937"/><text fill="#111827" x="92" y="380">0.2</text><line x1="95" y1="302" x2="100" y2="302" stroke="#1f2937"/><text fill="#111827" x="92" y="306">0.4</text><line x1="95" y1="228" x2="100" y2="228" stroke="#1f2937"/><text fill="#111827" x="92" y="232">0.6</text><line x1="95" y1="154" x2="100" y2="154" stroke="#1f2937"/><text fill="#111827" x="92" y="158">0.8</text><line x1="95" y1="80" x2="100" y2="80" stroke="#1f2937"/><text fill="#111827" x="92" y="84">1.0</text></g>
+<g font-size="11" fill="#6b7280" text-anchor="middle"><line x1="100" y1="450" x2="100" y2="455" stroke="#1f2937"/><text fill="#111827" x="100" y="470">0</text><line x1="260" y1="450" x2="260" y2="455" stroke="#1f2937"/><text fill="#111827" x="260" y="470">10</text><line x1="420" y1="450" x2="420" y2="455" stroke="#1f2937"/><text fill="#111827" x="420" y="470">20</text><line x1="580" y1="450" x2="580" y2="455" stroke="#1f2937"/><text fill="#111827" x="580" y="470">30</text><line x1="740" y1="450" x2="740" y2="455" stroke="#1f2937"/><text fill="#111827" x="740" y="470">40</text><line x1="900" y1="450" x2="900" y2="455" stroke="#1f2937"/><text fill="#111827" x="900" y="470">50</text></g>
+<g stroke="#e5e7eb" stroke-width="1"><line x1="100" y1="376" x2="900" y2="376"/><line x1="100" y1="302" x2="900" y2="302"/><line x1="100" y1="228" x2="900" y2="228"/><line x1="100" y1="154" x2="900" y2="154"/></g>
+<circle cx="130.9" cy="77.9" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="100.9" cy="77.4" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="116.2" cy="79.2" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="97.3" cy="80.0" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="97.2" cy="79.6" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="113.4" cy="77.5" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="131.5" cy="82.0" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="113.7" cy="78.3" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="132.8" cy="82.7" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="116.5" cy="79.4" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="182.9" cy="447.3" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="102.2" cy="78.7" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="113.9" cy="77.7" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="114.9" cy="81.9" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="114.1" cy="80.5" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="100.8" cy="79.2" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="100.3" cy="77.4" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="97.4" cy="78.2" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="117.1" cy="449.6" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<circle cx="98.9" cy="80.5" r="5" fill="#10b981" fill-opacity="0.55" stroke="#065f46" stroke-width="1"/>
+<line x1="100" y1="117.0" x2="900" y2="117.0" stroke="#065f46" stroke-width="1.4" stroke-dasharray="6,4" opacity="0.7"/>
+<rect x="650" y="80" width="14" height="14" fill="#10b981" stroke="#065f46" stroke-width="1"/><text x="672" y="91" font-weight="700" fill="#065f46">Claude Opus 4.7</text><text x="672" y="105" font-size="11" fill="#374151">avg quality 0.90 · total cost $1.49</text>
+<circle cx="99.7" cy="78.8" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="101.8" cy="81.2" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="98.5" cy="80.4" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="100.2" cy="452.3" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="101.4" cy="78.7" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="134.9" cy="77.7" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="115.5" cy="81.5" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="113.9" cy="79.9" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="113.2" cy="81.0" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="133.6" cy="80.4" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="822.3" cy="78.9" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="165.2" cy="450.6" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="132.5" cy="79.7" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="518.0" cy="82.7" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="147.8" cy="81.0" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="97.4" cy="81.2" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="100.9" cy="83.0" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="101.9" cy="78.7" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="195.3" cy="81.0" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<circle cx="97.1" cy="79.8" r="5" fill="#a855f7" fill-opacity="0.55" stroke="#581c87" stroke-width="1"/>
+<line x1="100" y1="117.0" x2="900" y2="117.0" stroke="#581c87" stroke-width="1.4" stroke-dasharray="6,4" opacity="0.7"/>
+<rect x="650" y="102" width="14" height="14" fill="#a855f7" stroke="#581c87" stroke-width="1"/><text x="672" y="113" font-weight="700" fill="#581c87">Kimi K2.6</text><text x="672" y="127" font-size="11" fill="#374151">avg quality 0.90 · total cost $0.92</text>
+<circle cx="114.0" cy="77.7" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="113.4" cy="81.6" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="113.8" cy="78.5" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="115.3" cy="82.2" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="97.5" cy="79.7" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="116.3" cy="82.3" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="117.9" cy="82.2" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="114.7" cy="79.5" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="115.2" cy="82.3" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="166.7" cy="77.9" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="258.1" cy="448.4" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="114.4" cy="449.9" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="196.5" cy="78.6" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="113.0" cy="79.5" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="163.2" cy="80.4" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="102.7" cy="81.1" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="164.1" cy="80.7" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="117.1" cy="77.3" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="150.4" cy="451.7" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="118.2" cy="81.8" r="5" fill="#3b82f6" fill-opacity="0.55" stroke="#1e3a8a" stroke-width="1"/>
+<line x1="100" y1="135.5" x2="900" y2="135.5" stroke="#1e3a8a" stroke-width="1.4" stroke-dasharray="6,4" opacity="0.7"/>
+<rect x="650" y="124" width="14" height="14" fill="#3b82f6" stroke="#1e3a8a" stroke-width="1"/><text x="672" y="135" font-weight="700" fill="#1e3a8a">DeepSeek V4-Pro</text><text x="672" y="149" font-size="11" fill="#374151">avg quality 0.85 · total cost $0.11</text>
+<text x="500" y="555" text-anchor="middle" fill="#6b7280" font-size="11">Each dot = one task (jittered). Dashed line = per-model average quality. Source: results/{opus,kimi,deepseek}/results_*.json</text>
 </svg>
